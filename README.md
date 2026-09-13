@@ -1,6 +1,6 @@
 # Cena energii PSE
 
-Lekka aplikacja webowa bez frameworka i bez kluczy API. Pobiera aktualną prognozowaną cenę CEN (`cen_fcst`) z endpointu `price-fcst` publicznego API PSE (`api.raporty.pse.pl`), odświeża ją co 60 sekund i pokazuje zakresy: minuta (surowe interwały PSE), godzina, dzień oraz miesiąc.
+Lekka aplikacja webowa bez frameworka i bez kluczy API. Pobiera aktualną prognozowaną cenę CEN (`cen_fcst`) z endpointu `price-fcst` publicznego API PSE (`api.raporty.pse.pl`), odświeża ją co 60 sekund i pokazuje wykres całej doby w surowych interwałach 15-minutowych.
 
 ## Uruchomienie
 

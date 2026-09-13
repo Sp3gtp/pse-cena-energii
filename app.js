@@ -68,7 +68,7 @@ function render() {
   const current = state.records.find((item) => item.time > now) ?? state.records.at(-1);
   $("current-price").textContent = current ? current.price.toLocaleString("pl-PL", { maximumFractionDigits: 2 }) : "—";
   $("current-period").textContent = current ? (current.period || formatTime(current.time)) : "Brak odczytu";
-  $("chart-title").textContent = { minute: "Ceny w bieżącym dniu", hour: "Średnia cena godzinowa", day: "Średnia cena dzienna", month: "Średnia cena miesięczna" }[state.range];
+  $("chart-title").textContent = "Ceny energii w dobie";
   $("data-table").innerHTML = records.slice(-12).reverse().map((r) => `<tr><td>${r.period || formatTime(r.time)}</td><td>${r.price.toLocaleString("pl-PL", { maximumFractionDigits: 2 })}</td></tr>`).join("") || '<tr><td colspan="2" class="muted">Brak danych dla wybranego dnia</td></tr>';
   drawChart(records);
 }
