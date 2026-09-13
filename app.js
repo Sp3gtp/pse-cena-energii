@@ -1,5 +1,7 @@
 const API_URL = "https://api.raporty.pse.pl/api/price-fcst";
 const REFRESH_MS = 60_000;
+const WATCHDOG_MS = 10_000;
+const MAX_SYNC_AGE_MS = REFRESH_MS * 2 + WATCHDOG_MS;
 const ALERT_THRESHOLD = 100;
 const DEFAULT_FALL_THRESHOLD = 550;
 const DEFAULT_RISE_THRESHOLD = 650;
@@ -16,6 +18,7 @@ let previousCurrentPrice = null;
 let audioContext = null;
 let alertsEnabled = false;
 let priceAlarmTriggered = false;
+let lastSuccessfulSyncAt = null;
 
 const $ = (id) => document.getElementById(id);
 function today() { return new Date().toISOString().slice(0, 10); }
@@ -23,6 +26,15 @@ function setStatus(text, kind) {
   const el = $("connection-status");
   el.textContent = text;
   el.className = `status status-${kind}`;
+}
+function setWatchdogWarning(isStale) {
+  const warning = $("sync-watchdog");
+  warning.hidden = !isStale;
+  if (isStale) setStatus("uwaga nieaktualne dane", "error");
+}
+function checkSyncWatchdog() {
+  const isStale = lastSuccessfulSyncAt === null || Date.now() - lastSuccessfulSyncAt > MAX_SYNC_AGE_MS;
+  setWatchdogWarning(isStale);
 }
 function number(value) {
   const result = Number(String(value ?? "").replace(",", "."));
@@ -208,6 +220,9 @@ async function load() {
   try {
     state.records = await fetchRecords();
     render();
+    if (!state.records.length || state.records.some((record) => !Number.isFinite(record.price) || Number.isNaN(record.time.getTime()))) {
+      throw new Error("PSE nie zwróciło prawidłowych danych");
+    }
     const current = state.records.find((item) => item.time > new Date()) ?? state.records.at(-1);
     if (current && previousCurrentPrice !== null) {
       const change = current.price - previousCurrentPrice;
@@ -226,10 +241,13 @@ async function load() {
     const now = new Date().toLocaleTimeString("pl-PL");
     $("updated-at").textContent = `Ostatnia synchronizacja: ${now}`;
     $("footer-time").textContent = now;
+    lastSuccessfulSyncAt = Date.now();
+    setWatchdogWarning(false);
     setStatus("Połączono z PSE", "ok");
   } catch (error) {
     setStatus("Błąd połączenia", "error");
     $("updated-at").textContent = error.message;
+    checkSyncWatchdog();
   }
 }
 $("date-input").value = state.date;
@@ -326,3 +344,4 @@ requestWakeLock();
 armAlertsAutomatically();
 load();
 state.timer = setInterval(load, REFRESH_MS);
+setInterval(checkSyncWatchdog, WATCHDOG_MS);

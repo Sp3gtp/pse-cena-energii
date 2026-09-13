@@ -26,6 +26,7 @@ h2 { margin-bottom: 0; font-size: 18px; }
 .status-loading { color: #f5c76b; background: #483b1f; }
 .status-ok { color: #66d9b4; background: #173c39; }
 .status-error { color: #ff9b9b; background: #492832; }
+.sync-watchdog { margin-top: 8px; padding: 8px 12px; color: #fff; background: #7b2737; border: 1px solid #ff8395; border-radius: 8px; font-size: 12px; font-weight: 800; text-align: center; }
 .toolbar { flex-wrap: wrap; margin-bottom: 16px; padding: 16px 20px; }
 .thresholds { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; width: 100%; padding-top: 4px; border-top: 1px solid #293b61; }
 .thresholds label { color: #bbc7db; }
