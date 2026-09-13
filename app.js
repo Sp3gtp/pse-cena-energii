@@ -198,7 +198,7 @@ function drawChart(records) {
   svg.innerHTML = `<defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#66d9b4" stop-opacity=".28"/><stop offset="1" stop-color="#66d9b4" stop-opacity="0"/></linearGradient></defs>
     ${yTicks}<line class="chart-axis" x1="${pad}" y1="${pad}" x2="${pad}" y2="${height - pad}"/><line class="chart-axis" x1="${pad}" y1="${height - pad}" x2="${width - pad}" y2="${height - pad}"/>
     <polygon class="chart-area" points="${area}"/><polyline class="chart-line" points="${line}"/>
-    ${pointMarks}${xTicks}<text class="axis-title" text-anchor="middle" x="${width / 2}" y="${height - 1}">Czas</text><text class="axis-title" text-anchor="middle" transform="translate(12 ${height / 2}) rotate(-90)">Cena [PLN/MWh]</text>
+    ${pointMarks}${xTicks}<text class="axis-title" text-anchor="middle" x="${width / 2}" y="${height - 1}">Czas</text><text class="axis-title" text-anchor="middle" transform="translate(2 ${height / 2}) rotate(-90)">Cena [PLN/MWh]</text>
     <text class="axis-label" x="${pad + 4}" y="${pad - 10}">maks. ${max.toLocaleString("pl-PL", { maximumFractionDigits: 2 })}</text>
     <text class="axis-label" x="${pad + 4}" y="${height - pad - 8}">min. ${min.toLocaleString("pl-PL", { maximumFractionDigits: 2 })}</text>`;
   const tooltip = $("chart-tooltip");
