@@ -161,7 +161,8 @@ function drawChart(records) {
   const svg = $("chart");
   if (!records.length) { svg.innerHTML = ""; return; }
   const width = 900, height = 300, pad = 38;
-  const min = Math.min(...records.map((r) => r.price)), max = Math.max(...records.map((r) => r.price));
+  const min = Math.min(...records.map((r) => r.price));
+  const max = Math.max(...records.map((r) => r.price));
   const span = max - min || 1;
   const point = (r, i) => [pad + (i / Math.max(records.length - 1, 1)) * (width - pad * 2), height - pad - ((r.price - min) / span) * (height - pad * 2)];
   const points = records.map(point);
@@ -170,7 +171,8 @@ function drawChart(records) {
   const yTicks = [0, .25, .5, .75, 1].map((ratio) => {
     const y = height - pad - ratio * (height - pad * 2);
     const value = min + ratio * span;
-    return `<line class="grid-line" x1="${pad}" y1="${y}" x2="${width - pad}" y2="${y}"/><text class="axis-label" x="4" y="${y + 4}">${value.toLocaleString("pl-PL", { maximumFractionDigits: 0 })}</text>`;
+    const label = value.toLocaleString("pl-PL", { maximumFractionDigits: 2 });
+    return `<line class="grid-line" x1="${pad}" y1="${y}" x2="${width - pad}" y2="${y}"/><text class="axis-label" x="4" y="${y + 4}">${label}</text>`;
   }).join("");
   const xTicks = [0, .25, .5, .75, 1].map((ratio) => {
     const index = Math.min(records.length - 1, Math.round(ratio * (records.length - 1)));
@@ -181,7 +183,9 @@ function drawChart(records) {
   svg.innerHTML = `<defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#66d9b4" stop-opacity=".28"/><stop offset="1" stop-color="#66d9b4" stop-opacity="0"/></linearGradient></defs>
     ${yTicks}<line class="chart-axis" x1="${pad}" y1="${pad}" x2="${pad}" y2="${height - pad}"/><line class="chart-axis" x1="${pad}" y1="${height - pad}" x2="${width - pad}" y2="${height - pad}"/>
     <polygon class="chart-area" points="${area}"/><polyline class="chart-line" points="${line}"/>
-    ${pointMarks}${xTicks}<text class="axis-title" text-anchor="middle" x="${width / 2}" y="${height - 1}">Czas</text><text class="axis-title" text-anchor="middle" transform="translate(12 ${height / 2}) rotate(-90)">Cena [PLN/MWh]</text>`;
+    ${pointMarks}${xTicks}<text class="axis-title" text-anchor="middle" x="${width / 2}" y="${height - 1}">Czas</text><text class="axis-title" text-anchor="middle" transform="translate(12 ${height / 2}) rotate(-90)">Cena [PLN/MWh]</text>
+    <text class="axis-label" x="${pad + 4}" y="${pad - 10}">maks. ${max.toLocaleString("pl-PL", { maximumFractionDigits: 2 })}</text>
+    <text class="axis-label" x="${pad + 4}" y="${height - pad - 8}">min. ${min.toLocaleString("pl-PL", { maximumFractionDigits: 2 })}</text>`;
   const tooltip = $("chart-tooltip");
   svg.querySelectorAll(".chart-point").forEach((pointElement) => {
     const show = (event) => {
