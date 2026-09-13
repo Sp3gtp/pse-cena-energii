@@ -1,7 +1,11 @@
 const API_URL = "https://api.raporty.pse.pl/api/price-fcst";
 const REFRESH_MS = 60_000;
+const ALERT_THRESHOLD = 100;
 const state = { date: today(), range: "minute", records: [], timer: null };
 let wakeLock = null;
+let previousCurrentPrice = null;
+let audioContext = null;
+let alertsEnabled = false;
 
 const $ = (id) => document.getElementById(id);
 function today() { return new Date().toISOString().slice(0, 10); }
@@ -58,6 +62,30 @@ function render() {
   $("data-table").innerHTML = records.slice(-12).reverse().map((r) => `<tr><td>${r.period || formatTime(r.time)}</td><td>${r.price.toLocaleString("pl-PL", { maximumFractionDigits: 2 })}</td></tr>`).join("") || '<tr><td colspan="2" class="muted">Brak danych dla wybranego dnia</td></tr>';
   drawChart(records);
 }
+function setAlertStatus(text) {
+  $("alert-status").textContent = `Alerty: ${text}`;
+}
+async function enableAlerts() {
+  audioContext ??= new AudioContext();
+  await audioContext.resume();
+  alertsEnabled = true;
+  $("alert-button").textContent = "Alerty włączone";
+  setAlertStatus("włączone (próg 100 PLN)");
+}
+function notifyPriceChange(change) {
+  if (!alertsEnabled) return;
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  oscillator.type = "sine";
+  oscillator.frequency.value = change > 0 ? 880 : 440;
+  gain.gain.setValueAtTime(0.001, audioContext.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.22, audioContext.currentTime + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.55);
+  oscillator.connect(gain).connect(audioContext.destination);
+  oscillator.start();
+  oscillator.stop(audioContext.currentTime + 0.6);
+  if ("vibrate" in navigator) navigator.vibrate([180, 100, 180]);
+}
 function drawChart(records) {
   const svg = $("chart");
   if (!records.length) { svg.innerHTML = ""; return; }
@@ -79,6 +107,12 @@ async function load() {
   try {
     state.records = await fetchRecords();
     render();
+    const current = state.records.find((item) => item.time > new Date()) ?? state.records.at(-1);
+    if (current && previousCurrentPrice !== null) {
+      const change = current.price - previousCurrentPrice;
+      if (Math.abs(change) >= ALERT_THRESHOLD) notifyPriceChange(change);
+    }
+    if (current) previousCurrentPrice = current.price;
     const now = new Date().toLocaleTimeString("pl-PL");
     $("updated-at").textContent = `Ostatnia synchronizacja: ${now}`;
     $("footer-time").textContent = now;
@@ -115,6 +149,7 @@ document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") requestWakeLock();
 });
 $("reload-page-button").addEventListener("click", () => window.location.reload());
+$("alert-button").addEventListener("click", () => enableAlerts().catch(() => setAlertStatus("niedostępne")));
 requestWakeLock();
 load();
 state.timer = setInterval(load, REFRESH_MS);
