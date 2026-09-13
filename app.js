@@ -1,11 +1,13 @@
 const API_URL = "https://api.raporty.pse.pl/api/price-fcst";
 const REFRESH_MS = 60_000;
 const ALERT_THRESHOLD = 100;
+const PRICE_ALARM_LEVEL = 550;
 const state = { date: today(), range: "minute", records: [], timer: null };
 let wakeLock = null;
 let previousCurrentPrice = null;
 let audioContext = null;
 let alertsEnabled = false;
+let priceAlarmTriggered = false;
 
 const $ = (id) => document.getElementById(id);
 function today() { return new Date().toISOString().slice(0, 10); }
@@ -86,6 +88,23 @@ function notifyPriceChange(change) {
   oscillator.stop(audioContext.currentTime + 0.6);
   if ("vibrate" in navigator) navigator.vibrate([180, 100, 180]);
 }
+function playPriceAlarm() {
+  if (!alertsEnabled) return;
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  oscillator.type = "square";
+  oscillator.frequency.value = 660;
+  gain.gain.setValueAtTime(0.001, audioContext.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.2, audioContext.currentTime + 0.03);
+  oscillator.connect(gain).connect(audioContext.destination);
+  oscillator.start();
+  const stopAt = audioContext.currentTime + 3;
+  const pulse = setInterval(() => {
+    oscillator.frequency.value = oscillator.frequency.value === 660 ? 880 : 660;
+  }, 300);
+  oscillator.stop(stopAt);
+  oscillator.addEventListener("ended", () => clearInterval(pulse), { once: true });
+}
 function drawChart(records) {
   const svg = $("chart");
   if (!records.length) { svg.innerHTML = ""; return; }
@@ -111,6 +130,12 @@ async function load() {
     if (current && previousCurrentPrice !== null) {
       const change = current.price - previousCurrentPrice;
       if (Math.abs(change) >= ALERT_THRESHOLD) notifyPriceChange(change);
+      if (!priceAlarmTriggered && previousCurrentPrice > PRICE_ALARM_LEVEL && current.price <= PRICE_ALARM_LEVEL) {
+        playPriceAlarm();
+        priceAlarmTriggered = true;
+      } else if (current.price > PRICE_ALARM_LEVEL) {
+        priceAlarmTriggered = false;
+      }
     }
     if (current) previousCurrentPrice = current.price;
     const now = new Date().toLocaleTimeString("pl-PL");
