@@ -68,7 +68,9 @@ function setAlertStatus(text) {
   $("alert-status").textContent = `Alerty: ${text}`;
 }
 async function enableAlerts() {
-  audioContext ??= new AudioContext();
+  const AudioContextClass = window.AudioContext ?? window.webkitAudioContext;
+  if (!AudioContextClass) throw new Error("Audio nie jest obsługiwane");
+  audioContext ??= new AudioContextClass();
   await audioContext.resume();
   alertsEnabled = true;
   $("alert-button").textContent = "Alerty włączone";
@@ -89,7 +91,7 @@ function notifyPriceChange(change) {
   if ("vibrate" in navigator) navigator.vibrate([180, 100, 180]);
 }
 function playPriceAlarm() {
-  if (!alertsEnabled) return;
+  if (!alertsEnabled || !audioContext) return false;
   const oscillator = audioContext.createOscillator();
   const gain = audioContext.createGain();
   oscillator.type = "square";
@@ -104,6 +106,7 @@ function playPriceAlarm() {
   }, 300);
   oscillator.stop(stopAt);
   oscillator.addEventListener("ended", () => clearInterval(pulse), { once: true });
+  return true;
 }
 function drawChart(records) {
   const svg = $("chart");
@@ -175,6 +178,14 @@ document.addEventListener("visibilitychange", () => {
 });
 $("reload-page-button").addEventListener("click", () => window.location.reload());
 $("alert-button").addEventListener("click", () => enableAlerts().catch(() => setAlertStatus("niedostępne")));
+$("test-alarm-button").addEventListener("click", async () => {
+  try {
+    await enableAlerts();
+    if (playPriceAlarm()) setAlertStatus("test alarmu — odtwarzanie");
+  } catch {
+    setAlertStatus("niedostępne");
+  }
+});
 requestWakeLock();
 load();
 state.timer = setInterval(load, REFRESH_MS);
