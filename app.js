@@ -75,6 +75,8 @@ async function enableAlerts() {
   await audioContext.resume();
   alertsEnabled = true;
   $("alert-button").textContent = "Alerty włączone";
+  $("alert-button").classList.add("is-active");
+  $("alert-button").setAttribute("aria-pressed", "true");
   setAlertStatus("włączone (próg 100 PLN)");
 }
 function notifyPriceChange(change) {
@@ -204,6 +206,7 @@ function markButton(button, text) {
 }
 $("refresh-button").addEventListener("click", async () => {
   markButton($("refresh-button"), "Pobieranie…");
+  setStatus("Pobieranie…", "loading");
   await load();
   markButton($("refresh-button"), "Dane pobrane");
 });
@@ -230,7 +233,8 @@ $("test-alarm-button").addEventListener("click", async () => {
 $("test-ping-button").addEventListener("click", async () => {
   try {
     await enableAlerts();
-    if (playPricePing()) setAlertStatus("test pingu — odtwarzanie");
+    setAlertStatus("test pingu — odtwarzanie");
+    playPricePing();
     markButton($("test-ping-button"), "Ping odtworzony");
   } catch {
     setAlertStatus("niedostępne");
