@@ -46,6 +46,11 @@
           <button type="button" id="reload-page-button" class="secondary">Odśwież stronę</button>
           <button type="button" id="alert-button" class="secondary">Włącz alerty</button>
         </div>
+        <div class="thresholds" aria-label="Progi alarmów">
+          <label>Alarm spadku <input id="fall-threshold" type="number" min="0" step="1" value="550" /> PLN/MWh</label>
+          <label>Alert wzrostu <input id="rise-threshold" type="number" min="0" step="1" value="650" /> PLN/MWh</label>
+          <button type="button" id="save-thresholds" class="secondary">Zapisz progi</button>
+        </div>
       </section>
 
       <section class="card chart-card">
@@ -55,6 +60,7 @@
         </div>
         <div class="chart-scroll">
           <svg id="chart" viewBox="0 0 900 300" role="img" aria-label="Wykres cen energii"></svg>
+          <div id="chart-tooltip" class="chart-tooltip" hidden></div>
         </div>
       </section>
 

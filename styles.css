@@ -27,6 +27,9 @@ h2 { margin-bottom: 0; font-size: 18px; }
 .status-ok { color: #66d9b4; background: #173c39; }
 .status-error { color: #ff9b9b; background: #492832; }
 .toolbar { flex-wrap: wrap; margin-bottom: 16px; padding: 16px 20px; }
+.thresholds { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; width: 100%; padding-top: 4px; border-top: 1px solid #293b61; }
+.thresholds label { color: #bbc7db; }
+.thresholds input { width: 92px; }
 label { display: flex; align-items: center; gap: 10px; color: #9caac2; font-size: 13px; }
 input, button { font: inherit; }
 input { padding: 9px 10px; color: #fff; background: #0d1629; border: 1px solid #344a75; border-radius: 8px; }
@@ -40,13 +43,18 @@ button { cursor: pointer; border: 0; }
 .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .secondary { padding: 9px 13px; border-radius: 8px; color: #bbc7db; background: #243556; }
 .chart-card, .table-card { padding: 22px 24px; margin-bottom: 16px; }
-.chart-scroll { overflow-x: auto; margin-top: 20px; }
+.chart-scroll { position: relative; overflow-x: auto; margin-top: 20px; }
 #chart { display: block; width: 100%; min-width: 680px; height: 300px; }
 .grid-line { stroke: #2b3d62; stroke-width: 1; }
 .chart-line { fill: none; stroke: #66d9b4; stroke-width: 3; }
 .chart-area { fill: url(#area); }
 .chart-dot { fill: #66d9b4; }
 .axis-label { fill: #9caac2; font-size: 11px; }
+.axis-title { fill: #bbc7db; font-size: 12px; font-weight: 700; }
+.chart-axis { stroke: #7890b7; stroke-width: 1.5; }
+.chart-point { fill: #66d9b4; stroke: #07131b; stroke-width: 2; cursor: crosshair; }
+.chart-point:hover { fill: #fff; r: 6; }
+.chart-tooltip { position: absolute; z-index: 2; padding: 7px 9px; color: #fff; background: #0b1324; border: 1px solid #66d9b4; border-radius: 7px; box-shadow: 0 5px 16px #0008; font-size: 12px; pointer-events: none; white-space: nowrap; }
 .table-wrap { overflow-x: auto; margin-top: 14px; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 12px 8px; border-bottom: 1px solid #293b61; text-align: left; }
@@ -65,6 +73,9 @@ a { color: #66d9b4; }
   .toolbar { align-items: flex-start; flex-direction: column; }
   .actions { width: 100%; }
   .actions button { flex: 1; }
+  .thresholds { align-items: stretch; flex-direction: column; }
+  .thresholds label { justify-content: space-between; }
+  .thresholds button { width: 100%; }
   .wake-lock { float: none; display: block; margin: 6px 0 0; }
   .test-alarm { float: none; margin: 8px 0 0; }
   .test-ping { float: none; margin: 8px 0 0; }

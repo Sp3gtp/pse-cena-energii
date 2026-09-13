@@ -19,3 +19,5 @@ Publiczna prognoza CEN PSE jest publikowana w interwałach 15-minutowych. Aplika
 Po kliknięciu **Włącz alerty** aplikacja sygnalizuje dźwiękiem i wibracją zmianę bieżącej ceny o co najmniej 100 PLN/MWh. Wibracja zależy od obsługi urządzenia, a dźwięk od zgody przeglądarki.
 
 Jeśli cena spadnie z poziomu powyżej 550 PLN/MWh do 550 PLN/MWh lub niżej, odtworzy się alarm audio przez 3 sekundy. Alarm wymaga wcześniejszego kliknięcia **Włącz alerty**.
+
+Progi spadku i wzrostu można zmienić bezpośrednio na stronie; przycisk **Zapisz progi** zapisuje je lokalnie w przeglądarce. Wykres ma osie czasu i ceny oraz tooltip po najechaniu na punkt.

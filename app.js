@@ -1,9 +1,16 @@
 const API_URL = "https://api.raporty.pse.pl/api/price-fcst";
 const REFRESH_MS = 60_000;
 const ALERT_THRESHOLD = 100;
-const PRICE_ALARM_LEVEL = 550;
-const PRICE_PING_LEVEL = 650;
-const state = { date: today(), range: "minute", records: [], timer: null };
+const DEFAULT_FALL_THRESHOLD = 550;
+const DEFAULT_RISE_THRESHOLD = 650;
+const state = {
+  date: today(),
+  range: "minute",
+  records: [],
+  timer: null,
+  fallThreshold: Number(localStorage.getItem("fallThreshold")) || DEFAULT_FALL_THRESHOLD,
+  riseThreshold: Number(localStorage.getItem("riseThreshold")) || DEFAULT_RISE_THRESHOLD
+};
 let wakeLock = null;
 let previousCurrentPrice = null;
 let audioContext = null;
@@ -114,17 +121,17 @@ function playPriceAlarm() {
 function playPricePing() {
   if (!alertsEnabled || !audioContext) return false;
   const now = audioContext.currentTime;
-  [880, 1175].forEach((frequency, index) => {
+  [880, 1175, 880, 1175, 880].forEach((frequency, index) => {
     const oscillator = audioContext.createOscillator();
     const gain = audioContext.createGain();
     oscillator.type = "sine";
     oscillator.frequency.value = frequency;
-    gain.gain.setValueAtTime(0.001, now + index * 0.12);
-    gain.gain.exponentialRampToValueAtTime(0.18, now + index * 0.12 + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.12 + 0.18);
+    gain.gain.setValueAtTime(0.001, now + index * 0.28);
+    gain.gain.exponentialRampToValueAtTime(0.18, now + index * 0.28 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.28 + 0.22);
     oscillator.connect(gain).connect(audioContext.destination);
-    oscillator.start(now + index * 0.12);
-    oscillator.stop(now + index * 0.12 + 0.2);
+    oscillator.start(now + index * 0.28);
+    oscillator.stop(now + index * 0.28 + 0.24);
   });
   if ("vibrate" in navigator) navigator.vibrate(80);
   return true;
@@ -139,11 +146,37 @@ function drawChart(records) {
   const points = records.map(point);
   const line = points.map(([x, y]) => `${x},${y}`).join(" ");
   const area = `${pad},${height - pad} ${line} ${width - pad},${height - pad}`;
+  const yTicks = [0, .25, .5, .75, 1].map((ratio) => {
+    const y = height - pad - ratio * (height - pad * 2);
+    const value = min + ratio * span;
+    return `<line class="grid-line" x1="${pad}" y1="${y}" x2="${width - pad}" y2="${y}"/><text class="axis-label" x="4" y="${y + 4}">${value.toLocaleString("pl-PL", { maximumFractionDigits: 0 })}</text>`;
+  }).join("");
+  const xTicks = [0, .25, .5, .75, 1].map((ratio) => {
+    const index = Math.min(records.length - 1, Math.round(ratio * (records.length - 1)));
+    const [x] = points[index];
+    return `<text class="axis-label" text-anchor="middle" x="${x}" y="${height - 12}">${formatTime(records[index].time)}</text>`;
+  }).join("");
+  const pointMarks = points.map(([x, y], index) => `<circle class="chart-point" cx="${x}" cy="${y}" r="4" tabindex="0" data-index="${index}"></circle>`).join("");
   svg.innerHTML = `<defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#66d9b4" stop-opacity=".28"/><stop offset="1" stop-color="#66d9b4" stop-opacity="0"/></linearGradient></defs>
-    <line class="grid-line" x1="${pad}" y1="${pad}" x2="${width - pad}" y2="${pad}"/><line class="grid-line" x1="${pad}" y1="${height - pad}" x2="${width - pad}" y2="${height - pad}"/>
+    ${yTicks}<line class="chart-axis" x1="${pad}" y1="${pad}" x2="${pad}" y2="${height - pad}"/><line class="chart-axis" x1="${pad}" y1="${height - pad}" x2="${width - pad}" y2="${height - pad}"/>
     <polygon class="chart-area" points="${area}"/><polyline class="chart-line" points="${line}"/>
-    <text class="axis-label" x="${pad}" y="${pad - 10}">${max.toLocaleString("pl-PL", { maximumFractionDigits: 0 })}</text><text class="axis-label" x="${pad}" y="${height - 8}">${min.toLocaleString("pl-PL", { maximumFractionDigits: 0 })}</text>
-    <text class="axis-label" x="${pad}" y="${height - 8}">${formatTime(records[0].time)}</text><text class="axis-label" x="${width - pad - 36}" y="${height - 8}">${formatTime(records.at(-1).time)}</text>`;
+    ${pointMarks}${xTicks}<text class="axis-title" text-anchor="middle" x="${width / 2}" y="${height - 1}">Czas</text><text class="axis-title" text-anchor="middle" transform="translate(12 ${height / 2}) rotate(-90)">Cena [PLN/MWh]</text>`;
+  const tooltip = $("chart-tooltip");
+  svg.querySelectorAll(".chart-point").forEach((pointElement) => {
+    const show = (event) => {
+      const record = records[Number(pointElement.dataset.index)];
+      tooltip.textContent = `${formatTime(record.time)} — ${record.price.toLocaleString("pl-PL", { maximumFractionDigits: 2 })} PLN/MWh`;
+      tooltip.hidden = false;
+      const x = Number.isFinite(event.offsetX) ? event.offsetX : pointElement.cx.baseVal.value;
+      const y = Number.isFinite(event.offsetY) ? event.offsetY : pointElement.cy.baseVal.value;
+      tooltip.style.left = `${Math.max(4, Math.min(x + 12, svg.clientWidth - 190))}px`;
+      tooltip.style.top = `${Math.max(y - 42, 4)}px`;
+    };
+    pointElement.addEventListener("pointerenter", show);
+    pointElement.addEventListener("focus", show);
+    pointElement.addEventListener("pointerleave", () => { tooltip.hidden = true; });
+    pointElement.addEventListener("blur", () => { tooltip.hidden = true; });
+  });
 }
 async function load() {
   setStatus("Pobieranie…", "loading");
@@ -154,13 +187,13 @@ async function load() {
     if (current && previousCurrentPrice !== null) {
       const change = current.price - previousCurrentPrice;
       if (Math.abs(change) >= ALERT_THRESHOLD) notifyPriceChange(change);
-      if (!priceAlarmTriggered && previousCurrentPrice > PRICE_ALARM_LEVEL && current.price <= PRICE_ALARM_LEVEL) {
+      if (!priceAlarmTriggered && previousCurrentPrice > state.fallThreshold && current.price <= state.fallThreshold) {
         playPriceAlarm();
         priceAlarmTriggered = true;
-      } else if (current.price > PRICE_ALARM_LEVEL) {
+      } else if (current.price > state.fallThreshold) {
         priceAlarmTriggered = false;
       }
-      if (previousCurrentPrice <= PRICE_PING_LEVEL && current.price > PRICE_PING_LEVEL) {
+      if (previousCurrentPrice <= state.riseThreshold && current.price > state.riseThreshold) {
         playPricePing();
       }
     }
@@ -175,6 +208,8 @@ async function load() {
   }
 }
 $("date-input").value = state.date;
+$("fall-threshold").value = state.fallThreshold;
+$("rise-threshold").value = state.riseThreshold;
 $("date-input").addEventListener("change", (event) => { state.date = event.target.value; load(); });
 document.querySelectorAll(".tab").forEach((button) => button.addEventListener("click", () => {
   document.querySelector(".tab.active").classList.remove("active");
@@ -239,6 +274,17 @@ $("test-ping-button").addEventListener("click", async () => {
   } catch {
     setAlertStatus("niedostępne");
   }
+});
+$("save-thresholds").addEventListener("click", () => {
+  const fall = Number($("fall-threshold").value);
+  const rise = Number($("rise-threshold").value);
+  if (!Number.isFinite(fall) || !Number.isFinite(rise) || fall < 0 || rise < 0) return;
+  state.fallThreshold = fall;
+  state.riseThreshold = rise;
+  localStorage.setItem("fallThreshold", String(fall));
+  localStorage.setItem("riseThreshold", String(rise));
+  setAlertStatus(`progi: spadek ≤${fall}, wzrost >${rise}`);
+  markButton($("save-thresholds"), "Progi zapisane");
 });
 requestWakeLock();
 load();
