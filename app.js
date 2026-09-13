@@ -111,13 +111,14 @@ function playPriceAlarm() {
   oscillator.connect(gain).connect(audioContext.destination);
   oscillator.start();
   const stopAt = audioContext.currentTime + 3;
+  const speechTimer = setTimeout(speakPriceDrop, 800);
   const pulse = setInterval(() => {
     oscillator.frequency.value = oscillator.frequency.value === 660 ? 880 : 660;
   }, 300);
   oscillator.stop(stopAt);
   oscillator.addEventListener("ended", () => {
     clearInterval(pulse);
-    speakPriceDrop();
+    clearTimeout(speechTimer);
   }, { once: true });
   return true;
 }
@@ -126,7 +127,7 @@ function speakPriceDrop() {
   window.speechSynthesis.cancel();
   const message = new SpeechSynthesisUtterance("Uwaga Spadek Ceny");
   message.lang = "pl-PL";
-  message.rate = 0.9;
+  message.rate = 0.85;
   message.pitch = 1;
   message.volume = 1;
   window.speechSynthesis.speak(message);

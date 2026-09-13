@@ -20,6 +20,6 @@ Po kliknięciu **Włącz alerty** aplikacja sygnalizuje dźwiękiem i wibracją 
 
 Jeśli cena spadnie z poziomu powyżej 550 PLN/MWh do 550 PLN/MWh lub niżej, odtworzy się alarm audio przez 3 sekundy. Alarm wymaga wcześniejszego kliknięcia **Włącz alerty**.
 
-Po zakończeniu alarmu spadkowego przeglądarka wypowiada komunikat: „Uwaga Spadek Ceny” (jeżeli obsługuje syntezę mowy).
+Po około 0,8 sekundy od rozpoczęcia alarmu spadkowego przeglądarka wypowiada głośno komunikat: „Uwaga Spadek Ceny” (jeżeli obsługuje syntezę mowy). Głośność maksymalna syntezy zależy od głośności systemu.
 
 Progi spadku i wzrostu można zmienić bezpośrednio na stronie; przycisk **Zapisz progi** zapisuje je lokalnie w przeglądarce. Wykres ma osie czasu i ceny oraz tooltip po najechaniu na punkt.
