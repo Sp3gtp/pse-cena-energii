@@ -115,8 +115,21 @@ function playPriceAlarm() {
     oscillator.frequency.value = oscillator.frequency.value === 660 ? 880 : 660;
   }, 300);
   oscillator.stop(stopAt);
-  oscillator.addEventListener("ended", () => clearInterval(pulse), { once: true });
+  oscillator.addEventListener("ended", () => {
+    clearInterval(pulse);
+    speakPriceDrop();
+  }, { once: true });
   return true;
+}
+function speakPriceDrop() {
+  if (!("speechSynthesis" in window)) return;
+  window.speechSynthesis.cancel();
+  const message = new SpeechSynthesisUtterance("Uwaga Spadek Ceny");
+  message.lang = "pl-PL";
+  message.rate = 0.9;
+  message.pitch = 1;
+  message.volume = 1;
+  window.speechSynthesis.speak(message);
 }
 function playPricePing() {
   if (!alertsEnabled || !audioContext) return false;
