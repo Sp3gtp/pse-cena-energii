@@ -78,7 +78,10 @@ function render() {
   $("record-count").textContent = `${records.length} punktów`;
   const now = new Date();
   const current = state.records.find((item) => item.time > now) ?? state.records.at(-1);
-  $("current-price").textContent = current ? current.price.toLocaleString("pl-PL", { maximumFractionDigits: 2 }) : "—";
+  const currentPrice = $("current-price");
+  currentPrice.textContent = current ? current.price.toLocaleString("pl-PL", { maximumFractionDigits: 2 }) : "—";
+  currentPrice.classList.toggle("price-low", Boolean(current && current.price < state.fallThreshold));
+  currentPrice.classList.toggle("price-high", Boolean(current && current.price > state.riseThreshold));
   $("current-period").textContent = current ? (current.period || formatTime(current.time)) : "Brak odczytu";
   $("chart-title").textContent = "Ceny energii w dobie";
   $("data-table").innerHTML = records.slice(-12).reverse().map((r) => `<tr><td>${r.period || formatTime(r.time)}</td><td>${r.price.toLocaleString("pl-PL", { maximumFractionDigits: 2 })}</td></tr>`).join("") || '<tr><td colspan="2" class="muted">Brak danych dla wybranego dnia</td></tr>';
@@ -337,6 +340,7 @@ $("save-thresholds").addEventListener("click", () => {
   state.riseThreshold = rise;
   localStorage.setItem("fallThreshold", String(fall));
   localStorage.setItem("riseThreshold", String(rise));
+  render();
   setAlertStatus(`progi: spadek ≤${fall}, wzrost >${rise}`);
   markButton($("save-thresholds"), "Progi zapisane");
 });

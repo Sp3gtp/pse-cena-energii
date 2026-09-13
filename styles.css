@@ -21,6 +21,8 @@ h2 { margin-bottom: 0; font-size: 18px; }
 .period { margin-bottom: 8px; font-size: 28px; font-weight: 700; }
 .price-wrap { text-align: right; }
 .price { font-size: clamp(40px, 8vw, 76px); font-weight: 800; letter-spacing: -.06em; }
+.price-low { color: #ff667d; }
+.price-high { color: #66d9b4; }
 .unit { display: block; color: #66d9b4; font-weight: 700; }
 .status { padding: 8px 12px; border-radius: 99px; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .status-loading { color: #f5c76b; background: #483b1f; }
