@@ -141,6 +141,15 @@ function setAlertButtonState(enabled) {
   button.classList.toggle("is-enabled", enabled);
   button.setAttribute("aria-pressed", String(enabled));
 }
+async function disableAlerts() {
+  alertsEnabled = false;
+  priceAlarmTriggered = false;
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  if ("vibrate" in navigator) navigator.vibrate(0);
+  if (audioContext && audioContext.state === "running") await audioContext.suspend();
+  setAlertButtonState(false);
+  setAlertStatus("wyłączone");
+}
 function notifyPriceChange(change) {
   if (!alertsEnabled) return;
   const oscillator = audioContext.createOscillator();
@@ -340,8 +349,11 @@ $("reload-page-button").addEventListener("click", () => {
 });
 $("alert-button").addEventListener("click", async () => {
   try {
-    await enableAlerts();
-    setAlertButtonState(true);
+    if (alertsEnabled) {
+      await disableAlerts();
+    } else {
+      await enableAlerts();
+    }
   } catch {
     setAlertStatus("niedostępne");
   }
