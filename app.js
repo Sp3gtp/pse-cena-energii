@@ -80,6 +80,10 @@ async function enableAlerts() {
   if (!AudioContextClass) throw new Error("Audio nie jest obsługiwane");
   audioContext ??= new AudioContextClass();
   await audioContext.resume();
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
+  }
   alertsEnabled = true;
   $("alert-button").textContent = "Alerty włączone";
   $("alert-button").classList.add("is-active");
@@ -110,26 +114,29 @@ function playPriceAlarm() {
   gain.gain.exponentialRampToValueAtTime(0.2, audioContext.currentTime + 0.03);
   oscillator.connect(gain).connect(audioContext.destination);
   oscillator.start();
-  const stopAt = audioContext.currentTime + 3;
-  const speechTimer = setTimeout(speakPriceDrop, 800);
+  const stopAt = audioContext.currentTime + 1.2;
   const pulse = setInterval(() => {
     oscillator.frequency.value = oscillator.frequency.value === 660 ? 880 : 660;
   }, 300);
   oscillator.stop(stopAt);
   oscillator.addEventListener("ended", () => {
     clearInterval(pulse);
-    clearTimeout(speechTimer);
+    setTimeout(speakPriceDrop, 120);
   }, { once: true });
   return true;
 }
 function speakPriceDrop() {
   if (!("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
+  window.speechSynthesis.resume();
   const message = new SpeechSynthesisUtterance("Uwaga Spadek Ceny");
   message.lang = "pl-PL";
-  message.rate = 0.85;
+  message.rate = 0.8;
   message.pitch = 1;
   message.volume = 1;
+  const polishVoice = window.speechSynthesis.getVoices()
+    .find((voice) => voice.lang.toLowerCase().startsWith("pl"));
+  if (polishVoice) message.voice = polishVoice;
   window.speechSynthesis.speak(message);
 }
 function playPricePing() {
