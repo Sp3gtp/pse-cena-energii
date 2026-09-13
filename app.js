@@ -148,7 +148,7 @@ function playPricePing() {
     oscillator.type = "sine";
     oscillator.frequency.value = frequency;
     gain.gain.setValueAtTime(0.001, now + index * 0.28);
-    gain.gain.exponentialRampToValueAtTime(0.18, now + index * 0.28 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.45, now + index * 0.28 + 0.02);
     gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.28 + 0.22);
     oscillator.connect(gain).connect(audioContext.destination);
     oscillator.start(now + index * 0.28);
@@ -296,6 +296,17 @@ $("test-ping-button").addEventListener("click", async () => {
     setAlertStatus("niedostępne");
   }
 });
+function armAlertsAutomatically() {
+  alertsEnabled = true;
+  $("alert-button").textContent = "Alerty włączone";
+  $("alert-button").classList.add("is-active");
+  $("alert-button").setAttribute("aria-pressed", "true");
+  setAlertStatus("włączone — kliknij stronę, aby odblokować dźwięk");
+}
+document.addEventListener("pointerdown", () => {
+  if (!alertsEnabled) return;
+  enableAlerts().catch(() => setAlertStatus("włączone — dźwięk zablokowany przez przeglądarkę"));
+}, { once: true });
 $("save-thresholds").addEventListener("click", () => {
   const fall = Number($("fall-threshold").value);
   const rise = Number($("rise-threshold").value);
@@ -308,5 +319,6 @@ $("save-thresholds").addEventListener("click", () => {
   markButton($("save-thresholds"), "Progi zapisane");
 });
 requestWakeLock();
+armAlertsAutomatically();
 load();
 state.timer = setInterval(load, REFRESH_MS);

@@ -22,4 +22,6 @@ Jeśli cena spadnie z poziomu powyżej 550 PLN/MWh do 550 PLN/MWh lub niżej, od
 
 Po zakończeniu krótkiego sygnału alarmowego przeglądarka wypowiada głośno komunikat: „Uwaga Spadek Ceny”; komunikaty nie nakładają się. Na telefonie głos wymaga kliknięcia „Włącz alerty” przy otwartej stronie i zależy od obsługi syntezy mowy przez przeglądarkę.
 
+Alerty są automatycznie uzbrojone po wejściu na stronę. Przeglądarka może wymagać pierwszego kliknięcia/dotknięcia strony, aby odblokować dźwięk.
+
 Progi spadku i wzrostu można zmienić bezpośrednio na stronie; przycisk **Zapisz progi** zapisuje je lokalnie w przeglądarce. Wykres ma osie czasu i ceny oraz tooltip po najechaniu na punkt.
