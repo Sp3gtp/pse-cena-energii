@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1324" />
+    <title>Cena energii PSE</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="header">
+        <div>
+          <p class="eyebrow">PSE • CEN</p>
+          <h1>Cena energii elektrycznej</h1>
+          <p class="subtitle">Cena energii na rynku bilansującym z publicznego API PSE</p>
+        </div>
+        <div id="connection-status" class="status status-loading">Ładowanie…</div>
+      </header>
+
+      <section class="hero card">
+        <div>
+          <p class="label">Aktualny przedział</p>
+          <p id="current-period" class="period">—</p>
+          <p id="updated-at" class="muted">Oczekiwanie na dane…</p>
+        </div>
+        <div class="price-wrap">
+          <span id="current-price" class="price">—</span>
+          <span class="unit">PLN/MWh</span>
+        </div>
+      </section>
+
+      <section class="toolbar card">
+        <label>
+          Data
+          <input id="date-input" type="date" />
+        </label>
+        <div class="tabs" role="tablist" aria-label="Zakres danych">
+          <button class="tab active" data-range="minute">Minuta</button>
+          <button class="tab" data-range="hour">Godzina</button>
+          <button class="tab" data-range="day">Dzień</button>
+          <button class="tab" data-range="month">Miesiąc</button>
+        </div>
+        <button id="refresh-button" class="refresh">Odśwież teraz</button>
+      </section>
+
+      <section class="card chart-card">
+        <div class="section-heading">
+          <h2 id="chart-title">Ceny w bieżącym dniu</h2>
+          <span id="record-count" class="muted"></span>
+        </div>
+        <div class="chart-scroll">
+          <svg id="chart" viewBox="0 0 900 300" role="img" aria-label="Wykres cen energii"></svg>
+        </div>
+      </section>
+
+      <section class="card table-card">
+        <div class="section-heading">
+          <h2>Ostatnie odczyty</h2>
+          <span class="muted">automatyczna aktualizacja co 60 s</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Przedział</th><th>Cena [PLN/MWh]</th></tr></thead>
+            <tbody id="data-table"><tr><td colspan="2" class="muted">Brak danych</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer>
+        Źródło: <a href="https://raporty.pse.pl/" target="_blank" rel="noreferrer">raporty.pse.pl</a>
+        · odświeżono: <span id="footer-time">—</span>
+      </footer>
+    </main>
+    <script src="./app.js" defer></script>
+  </body>
+</html>
