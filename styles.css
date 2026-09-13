@@ -34,7 +34,9 @@ input { padding: 9px 10px; color: #fff; background: #0d1629; border: 1px solid #
 button { cursor: pointer; border: 0; }
 .tab, .refresh { padding: 9px 13px; border-radius: 8px; color: #bbc7db; background: #172541; }
 .tab.active, .refresh { color: #07131b; background: #66d9b4; font-weight: 800; }
-.refresh:hover { background: #8aebca; }
+.refresh:hover, .secondary:hover { background: #8aebca; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.secondary { padding: 9px 13px; border-radius: 8px; color: #bbc7db; background: #243556; }
 .chart-card, .table-card { padding: 22px 24px; margin-bottom: 16px; }
 .chart-scroll { overflow-x: auto; margin-top: 20px; }
 #chart { display: block; width: 100%; min-width: 680px; height: 300px; }
@@ -48,11 +50,14 @@ table { width: 100%; border-collapse: collapse; }
 th, td { padding: 12px 8px; border-bottom: 1px solid #293b61; text-align: left; }
 th:last-child, td:last-child { text-align: right; }
 footer { padding: 12px 2px; color: #7787a4; font-size: 12px; }
+.wake-lock { float: right; margin-left: 12px; }
 a { color: #66d9b4; }
 @media (max-width: 650px) {
   .shell { width: min(100% - 20px, 1120px); padding-top: 24px; }
   .header, .hero { align-items: flex-start; flex-direction: column; }
   .price-wrap { text-align: left; }
   .toolbar { align-items: flex-start; flex-direction: column; }
-  .refresh { width: 100%; }
+  .actions { width: 100%; }
+  .actions button { flex: 1; }
+  .wake-lock { float: none; display: block; margin: 6px 0 0; }
 }

@@ -1,6 +1,7 @@
 const API_URL = "https://api.raporty.pse.pl/api/price-fcst";
 const REFRESH_MS = 60_000;
 const state = { date: today(), range: "minute", records: [], timer: null };
+let wakeLock = null;
 
 const $ = (id) => document.getElementById(id);
 function today() { return new Date().toISOString().slice(0, 10); }
@@ -94,5 +95,26 @@ document.querySelectorAll(".tab").forEach((button) => button.addEventListener("c
   button.classList.add("active"); state.range = button.dataset.range; render();
 }));
 $("refresh-button").addEventListener("click", load);
+function updateWakeLockStatus(text) {
+  $("wake-lock-status").textContent = `Ekran: ${text}`;
+}
+async function requestWakeLock() {
+  if (!("wakeLock" in navigator)) {
+    updateWakeLockStatus("standardowo (brak obsługi)");
+    return;
+  }
+  try {
+    wakeLock = await navigator.wakeLock.request("screen");
+    updateWakeLockStatus("aktywny");
+    wakeLock.addEventListener("release", () => updateWakeLockStatus("standardowo"));
+  } catch {
+    updateWakeLockStatus("standardowo");
+  }
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") requestWakeLock();
+});
+$("reload-page-button").addEventListener("click", () => window.location.reload());
+requestWakeLock();
 load();
 state.timer = setInterval(load, REFRESH_MS);

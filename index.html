@@ -41,7 +41,10 @@
           <button class="tab" data-range="day">Dzień</button>
           <button class="tab" data-range="month">Miesiąc</button>
         </div>
-        <button id="refresh-button" class="refresh">Odśwież teraz</button>
+        <div class="actions">
+          <button id="refresh-button" class="refresh">Pobierz dane</button>
+          <button id="reload-page-button" class="secondary">Odśwież stronę</button>
+        </div>
       </section>
 
       <section class="card chart-card">
@@ -70,6 +73,7 @@
       <footer>
         Źródło: <a href="https://raporty.pse.pl/" target="_blank" rel="noreferrer">raporty.pse.pl</a>
         · odświeżono: <span id="footer-time">—</span>
+        <span id="wake-lock-status" class="wake-lock">Ekran: standardowo</span>
       </footer>
     </main>
     <script src="./app.js" defer></script>
