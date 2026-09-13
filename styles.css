@@ -35,6 +35,8 @@ button { cursor: pointer; border: 0; }
 .tab, .refresh { padding: 9px 13px; border-radius: 8px; color: #bbc7db; background: #172541; }
 .tab.active, .refresh { color: #07131b; background: #66d9b4; font-weight: 800; }
 .refresh:hover, .secondary:hover { background: #8aebca; }
+.refresh:focus-visible, .secondary:focus-visible, .test-alarm:focus-visible, .test-ping:focus-visible,
+.refresh.is-active, .secondary.is-active { outline: 2px solid #fff; outline-offset: 2px; transform: translateY(-1px); }
 .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .secondary { padding: 9px 13px; border-radius: 8px; color: #bbc7db; background: #243556; }
 .chart-card, .table-card { padding: 22px 24px; margin-bottom: 16px; }
@@ -53,6 +55,8 @@ footer { padding: 12px 2px; color: #7787a4; font-size: 12px; }
 .wake-lock { float: right; margin-left: 12px; }
 .test-alarm { float: right; margin-left: 12px; padding: 6px 10px; border: 1px solid #b86d78; border-radius: 7px; color: #ffd7dc; background: #472632; font-size: 12px; }
 .test-alarm:hover { background: #63303d; }
+.test-ping { float: right; margin-left: 12px; padding: 6px 10px; border: 1px solid #5c9bd1; border-radius: 7px; color: #d8edff; background: #1f3d5c; font-size: 12px; }
+.test-ping:hover { background: #2c5a82; }
 a { color: #66d9b4; }
 @media (max-width: 650px) {
   .shell { width: min(100% - 20px, 1120px); padding-top: 24px; }
@@ -63,4 +67,5 @@ a { color: #66d9b4; }
   .actions button { flex: 1; }
   .wake-lock { float: none; display: block; margin: 6px 0 0; }
   .test-alarm { float: none; margin: 8px 0 0; }
+  .test-ping { float: none; margin: 8px 0 0; }
 }

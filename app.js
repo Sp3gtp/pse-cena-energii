@@ -2,6 +2,7 @@ const API_URL = "https://api.raporty.pse.pl/api/price-fcst";
 const REFRESH_MS = 60_000;
 const ALERT_THRESHOLD = 100;
 const PRICE_ALARM_LEVEL = 550;
+const PRICE_PING_LEVEL = 650;
 const state = { date: today(), range: "minute", records: [], timer: null };
 let wakeLock = null;
 let previousCurrentPrice = null;
@@ -108,6 +109,24 @@ function playPriceAlarm() {
   oscillator.addEventListener("ended", () => clearInterval(pulse), { once: true });
   return true;
 }
+function playPricePing() {
+  if (!alertsEnabled || !audioContext) return false;
+  const now = audioContext.currentTime;
+  [880, 1175].forEach((frequency, index) => {
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.value = frequency;
+    gain.gain.setValueAtTime(0.001, now + index * 0.12);
+    gain.gain.exponentialRampToValueAtTime(0.18, now + index * 0.12 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.12 + 0.18);
+    oscillator.connect(gain).connect(audioContext.destination);
+    oscillator.start(now + index * 0.12);
+    oscillator.stop(now + index * 0.12 + 0.2);
+  });
+  if ("vibrate" in navigator) navigator.vibrate(80);
+  return true;
+}
 function drawChart(records) {
   const svg = $("chart");
   if (!records.length) { svg.innerHTML = ""; return; }
@@ -139,6 +158,9 @@ async function load() {
       } else if (current.price > PRICE_ALARM_LEVEL) {
         priceAlarmTriggered = false;
       }
+      if (previousCurrentPrice <= PRICE_PING_LEVEL && current.price > PRICE_PING_LEVEL) {
+        playPricePing();
+      }
     }
     if (current) previousCurrentPrice = current.price;
     const now = new Date().toLocaleTimeString("pl-PL");
@@ -156,7 +178,6 @@ document.querySelectorAll(".tab").forEach((button) => button.addEventListener("c
   document.querySelector(".tab.active").classList.remove("active");
   button.classList.add("active"); state.range = button.dataset.range; render();
 }));
-$("refresh-button").addEventListener("click", load);
 function updateWakeLockStatus(text) {
   $("wake-lock-status").textContent = `Ekran: ${text}`;
 }
@@ -176,12 +197,41 @@ async function requestWakeLock() {
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") requestWakeLock();
 });
-$("reload-page-button").addEventListener("click", () => window.location.reload());
-$("alert-button").addEventListener("click", () => enableAlerts().catch(() => setAlertStatus("niedostępne")));
+function markButton(button, text) {
+  button.classList.add("is-active");
+  button.textContent = text;
+  setTimeout(() => button.classList.remove("is-active"), 1200);
+}
+$("refresh-button").addEventListener("click", async () => {
+  markButton($("refresh-button"), "Pobieranie…");
+  await load();
+  markButton($("refresh-button"), "Dane pobrane");
+});
+$("reload-page-button").addEventListener("click", () => {
+  markButton($("reload-page-button"), "Odświeżanie…");
+  setTimeout(() => window.location.reload(), 100);
+});
+$("alert-button").addEventListener("click", async () => {
+  try {
+    await enableAlerts();
+    markButton($("alert-button"), "Alerty włączone");
+  } catch {
+    setAlertStatus("niedostępne");
+  }
+});
 $("test-alarm-button").addEventListener("click", async () => {
   try {
     await enableAlerts();
     if (playPriceAlarm()) setAlertStatus("test alarmu — odtwarzanie");
+  } catch {
+    setAlertStatus("niedostępne");
+  }
+});
+$("test-ping-button").addEventListener("click", async () => {
+  try {
+    await enableAlerts();
+    if (playPricePing()) setAlertStatus("test pingu — odtwarzanie");
+    markButton($("test-ping-button"), "Ping odtworzony");
   } catch {
     setAlertStatus("niedostępne");
   }

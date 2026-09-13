@@ -42,9 +42,9 @@
           <button class="tab" data-range="month">Miesiąc</button>
         </div>
         <div class="actions">
-          <button id="refresh-button" class="refresh">Pobierz dane</button>
-          <button id="reload-page-button" class="secondary">Odśwież stronę</button>
-          <button id="alert-button" class="secondary">Włącz alerty</button>
+          <button type="button" id="refresh-button" class="refresh">Pobierz dane</button>
+          <button type="button" id="reload-page-button" class="secondary">Odśwież stronę</button>
+          <button type="button" id="alert-button" class="secondary">Włącz alerty</button>
         </div>
       </section>
 
@@ -76,7 +76,8 @@
         · odświeżono: <span id="footer-time">—</span>
         <span id="wake-lock-status" class="wake-lock">Ekran: standardowo</span>
         <span id="alert-status" class="wake-lock">Alerty: wyłączone</span>
-        <button id="test-alarm-button" class="test-alarm">Testuj alarm 3 s</button>
+        <button type="button" id="test-alarm-button" class="test-alarm">Testuj alarm 3 s</button>
+        <button type="button" id="test-ping-button" class="test-ping">Testuj ping &gt;650</button>
       </footer>
     </main>
     <script src="./app.js" defer></script>
