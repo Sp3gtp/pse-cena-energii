@@ -43,12 +43,23 @@ function number(value) {
 function normalizeRecord(raw) {
   const price = number(raw.cen_fcst ?? raw.cen_cost ?? raw.price ?? raw.value);
   const time = raw.dtime ?? raw.date ?? raw.timestamp ?? raw.periodStart;
-  if (price === null || !time) return null;
-  return { time: new Date(time), price, period: raw.period ?? "" };
+  const parsedTime = new Date(time);
+  if (price === null || !Number.isFinite(parsedTime.getTime())) return null;
+  return { time: parsedTime, price, period: typeof raw.period === "string" ? raw.period : "" };
 }
 async function fetchRecords() {
   const filter = encodeURIComponent(`business_date eq '${state.date}'`);
-  const response = await fetch(`${API_URL}?%24filter=${filter}`, { headers: { Accept: "application/json" } });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15_000);
+  let response;
+  try {
+    response = await fetch(`${API_URL}?%24filter=${filter}`, {
+      headers: { Accept: "application/json" },
+      signal: controller.signal
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
   if (!response.ok) throw new Error(`API PSE zwróciło HTTP ${response.status}`);
   const payload = await response.json();
   const rows = Array.isArray(payload) ? payload : (payload.value ?? payload.data ?? []);
@@ -84,7 +95,28 @@ function render() {
   currentPrice.classList.toggle("price-high", Boolean(current && current.price > state.riseThreshold));
   $("current-period").textContent = current ? (current.period || formatTime(current.time)) : "Brak odczytu";
   $("chart-title").textContent = "Ceny energii w dobie";
-  $("data-table").innerHTML = records.slice(-12).reverse().map((r) => `<tr><td>${r.period || formatTime(r.time)}</td><td>${r.price.toLocaleString("pl-PL", { maximumFractionDigits: 2 })}</td></tr>`).join("") || '<tr><td colspan="2" class="muted">Brak danych dla wybranego dnia</td></tr>';
+  const table = $("data-table");
+  table.replaceChildren();
+  const recentRecords = records.slice(-12).reverse();
+  if (!recentRecords.length) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 2;
+    cell.className = "muted";
+    cell.textContent = "Brak danych dla wybranego dnia";
+    row.appendChild(cell);
+    table.appendChild(row);
+  } else {
+    recentRecords.forEach((record) => {
+      const row = document.createElement("tr");
+      const periodCell = document.createElement("td");
+      const priceCell = document.createElement("td");
+      periodCell.textContent = record.period || formatTime(record.time);
+      priceCell.textContent = record.price.toLocaleString("pl-PL", { maximumFractionDigits: 2 });
+      row.append(periodCell, priceCell);
+      table.appendChild(row);
+    });
+  }
   drawChart(records);
 }
 function setAlertStatus(text) {
