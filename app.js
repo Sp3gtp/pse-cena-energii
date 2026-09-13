@@ -132,10 +132,14 @@ async function enableAlerts() {
     window.speechSynthesis.resume();
   }
   alertsEnabled = true;
-  $("alert-button").textContent = "Alerty włączone";
-  $("alert-button").classList.add("is-active");
-  $("alert-button").setAttribute("aria-pressed", "true");
+  setAlertButtonState(true);
   setAlertStatus("włączone (próg 100 PLN)");
+}
+function setAlertButtonState(enabled) {
+  const button = $("alert-button");
+  button.textContent = enabled ? "Alerty włączone" : "Włącz alerty";
+  button.classList.toggle("is-enabled", enabled);
+  button.setAttribute("aria-pressed", String(enabled));
 }
 function notifyPriceChange(change) {
   if (!alertsEnabled) return;
@@ -289,6 +293,13 @@ $("date-input").value = state.date;
 $("fall-threshold").value = state.fallThreshold;
 $("rise-threshold").value = state.riseThreshold;
 $("date-input").addEventListener("change", (event) => { state.date = event.target.value; load(); });
+$("today-button").addEventListener("click", () => {
+  const currentDate = today();
+  if (state.date === currentDate) return;
+  state.date = currentDate;
+  $("date-input").value = currentDate;
+  load();
+});
 document.querySelectorAll(".tab").forEach((button) => button.addEventListener("click", () => {
   document.querySelector(".tab.active").classList.remove("active");
   button.classList.add("active"); state.range = button.dataset.range; render();
@@ -330,7 +341,7 @@ $("reload-page-button").addEventListener("click", () => {
 $("alert-button").addEventListener("click", async () => {
   try {
     await enableAlerts();
-    markButton($("alert-button"), "Alerty włączone");
+    setAlertButtonState(true);
   } catch {
     setAlertStatus("niedostępne");
   }
@@ -355,9 +366,7 @@ $("test-ping-button").addEventListener("click", async () => {
 });
 function armAlertsAutomatically() {
   alertsEnabled = true;
-  $("alert-button").textContent = "Alerty włączone";
-  $("alert-button").classList.add("is-active");
-  $("alert-button").setAttribute("aria-pressed", "true");
+  setAlertButtonState(true);
   setAlertStatus("włączone — kliknij stronę, aby odblokować dźwięk");
 }
 document.addEventListener("pointerdown", () => {

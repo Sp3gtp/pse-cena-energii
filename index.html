@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0b1324" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://api.raporty.pse.pl; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; form-action 'self'" />
     <title>Cena energii PSE</title>
-    <link rel="stylesheet" href="./styles.css?v=chart-label" />
+    <link rel="stylesheet" href="./styles.css?v=today-alerts" />
   </head>
   <body>
     <main class="shell">
@@ -35,17 +35,20 @@
       </section>
 
       <section class="toolbar card">
-        <label>
-          Data
-          <input id="date-input" type="date" />
-        </label>
+        <div class="date-controls">
+          <label>
+            Data
+            <input id="date-input" type="date" />
+          </label>
+          <button type="button" id="today-button" class="secondary">Dzisiaj</button>
+        </div>
         <div class="tabs" role="tablist" aria-label="Zakres danych">
           <button class="tab active" data-range="minute">Doba</button>
         </div>
         <div class="actions">
           <button type="button" id="refresh-button" class="refresh">Pobierz dane</button>
           <button type="button" id="reload-page-button" class="secondary">Odśwież stronę</button>
-          <button type="button" id="alert-button" class="secondary">Włącz alerty</button>
+          <button type="button" id="alert-button" class="secondary" aria-pressed="false">Włącz alerty</button>
         </div>
         <div class="thresholds" aria-label="Progi alarmów">
           <label>Alarm spadku <input id="fall-threshold" type="number" min="0" step="1" value="550" /> PLN/MWh</label>
@@ -88,6 +91,6 @@
         <div class="author-signature">Aplikacja Stworzona Przez Eryka SP3GTP</div>
       </footer>
     </main>
-    <script src="./app.js?v=security" defer></script>
+    <script src="./app.js?v=today-alerts" defer></script>
   </body>
 </html>
