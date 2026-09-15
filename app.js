@@ -183,7 +183,7 @@ function playPriceAlarm() {
   oscillator.type = "square";
   oscillator.frequency.value = 660;
   gain.gain.setValueAtTime(0.001, audioContext.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.2, audioContext.currentTime + 0.03);
+  gain.gain.exponentialRampToValueAtTime(0.45, audioContext.currentTime + 0.03);
   oscillator.connect(gain).connect(audioContext.destination);
   oscillator.start();
   const stopAt = audioContext.currentTime + 1.2;
