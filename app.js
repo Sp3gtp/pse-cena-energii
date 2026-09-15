@@ -5,14 +5,18 @@ const MAX_SYNC_AGE_MS = REFRESH_MS * 2 + WATCHDOG_MS;
 const ALERT_THRESHOLD = 100;
 const DEFAULT_FALL_THRESHOLD = 550;
 const DEFAULT_RISE_THRESHOLD = 650;
+function storedThreshold(key, fallback) {
+  const value = Number(localStorage.getItem(key));
+  return Number.isFinite(value) && value >= 0 ? value : fallback;
+}
 const state = {
   date: today(),
   followToday: true,
   range: "minute",
   records: [],
   timer: null,
-  fallThreshold: Number(localStorage.getItem("fallThreshold")) || DEFAULT_FALL_THRESHOLD,
-  riseThreshold: Number(localStorage.getItem("riseThreshold")) || DEFAULT_RISE_THRESHOLD
+  fallThreshold: storedThreshold("fallThreshold", DEFAULT_FALL_THRESHOLD),
+  riseThreshold: storedThreshold("riseThreshold", DEFAULT_RISE_THRESHOLD)
 };
 let wakeLock = null;
 let previousCurrentPrice = null;
