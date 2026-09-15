@@ -7,6 +7,7 @@ const DEFAULT_FALL_THRESHOLD = 550;
 const DEFAULT_RISE_THRESHOLD = 650;
 const state = {
   date: today(),
+  followToday: true,
   range: "minute",
   records: [],
   timer: null,
@@ -21,7 +22,12 @@ let priceAlarmTriggered = false;
 let lastSuccessfulSyncAt = null;
 
 const $ = (id) => document.getElementById(id);
-function today() { return new Date().toISOString().slice(0, 10); }
+function today() {
+  const date = new Date();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
 function setStatus(text, kind) {
   const el = $("connection-status");
   el.textContent = text;
@@ -264,6 +270,13 @@ function drawChart(records) {
   });
 }
 async function load() {
+  const currentDate = today();
+  if (state.followToday && state.date !== currentDate) {
+    state.date = currentDate;
+    $("date-input").value = currentDate;
+    previousCurrentPrice = null;
+    priceAlarmTriggered = false;
+  }
   setStatus("Pobieranie…", "loading");
   try {
     state.records = await fetchRecords();
@@ -301,9 +314,14 @@ async function load() {
 $("date-input").value = state.date;
 $("fall-threshold").value = state.fallThreshold;
 $("rise-threshold").value = state.riseThreshold;
-$("date-input").addEventListener("change", (event) => { state.date = event.target.value; load(); });
+$("date-input").addEventListener("change", (event) => {
+  state.date = event.target.value;
+  state.followToday = state.date === today();
+  load();
+});
 $("today-button").addEventListener("click", () => {
   const currentDate = today();
+  state.followToday = true;
   if (state.date === currentDate) return;
   state.date = currentDate;
   $("date-input").value = currentDate;
