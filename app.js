@@ -6,7 +6,9 @@ const ALERT_THRESHOLD = 100;
 const DEFAULT_FALL_THRESHOLD = 550;
 const DEFAULT_RISE_THRESHOLD = 650;
 function storedThreshold(key, fallback) {
-  const value = Number(localStorage.getItem(key));
+  const stored = localStorage.getItem(key);
+  if (stored === null || stored.trim() === "") return fallback;
+  const value = Number(stored);
   return Number.isFinite(value) && value >= 0 ? value : fallback;
 }
 const state = {
