@@ -257,7 +257,7 @@ function drawChart(records) {
   const pointMarks = points.map(([x, y], index) => `<circle class="chart-point" cx="${x}" cy="${y}" r="4" tabindex="0" data-index="${index}"></circle>`).join("");
   const zeroY = yForValue(0);
   const zeroLine = `<line class="zero-line" x1="${pad}" y1="${zeroY}" x2="${width - pad}" y2="${zeroY}"/>
-    <text class="axis-label zero-label" x="${pad + 4}" y="${Math.max(pad + 12, zeroY - 8)}">0 zł</text>`;
+    <text class="axis-label zero-label" text-anchor="end" x="${width - pad - 4}" y="${zeroY - 6}">0 zł</text>`;
   svg.innerHTML = `<defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#66d9b4" stop-opacity=".28"/><stop offset="1" stop-color="#66d9b4" stop-opacity="0"/></linearGradient></defs>
     ${yTicks}<line class="chart-axis" x1="${pad}" y1="${pad}" x2="${pad}" y2="${height - pad}"/><line class="chart-axis" x1="${pad}" y1="${height - pad}" x2="${width - pad}" y2="${height - pad}"/>
     ${zeroLine}<polygon class="chart-area" points="${area}"/><polyline class="chart-line" points="${line}"/>
