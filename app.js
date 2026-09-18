@@ -105,6 +105,10 @@ function render() {
   currentPrice.textContent = current ? current.price.toLocaleString("pl-PL", { maximumFractionDigits: 2 }) : "—";
   currentPrice.classList.toggle("price-low", Boolean(current && current.price < state.fallThreshold));
   currentPrice.classList.toggle("price-high", Boolean(current && current.price > state.riseThreshold));
+  const popupPrice = $("popup-price");
+  popupPrice.textContent = currentPrice.textContent;
+  popupPrice.classList.toggle("price-low", currentPrice.classList.contains("price-low"));
+  popupPrice.classList.toggle("price-high", currentPrice.classList.contains("price-high"));
   $("current-period").textContent = current ? (current.period || formatTime(current.time)) : "Brak odczytu";
   $("chart-title").textContent = "Ceny energii w dobie";
   const table = $("data-table");
@@ -338,6 +342,20 @@ $("today-button").addEventListener("click", () => {
   state.date = currentDate;
   $("date-input").value = currentDate;
   load();
+});
+const pricePopup = $("price-popup");
+$("price-popup-button").addEventListener("click", () => {
+  if (!pricePopup.open) pricePopup.showModal();
+});
+pricePopup.addEventListener("click", (event) => {
+  if (event.target === pricePopup) pricePopup.close();
+});
+pricePopup.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  pricePopup.close();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && pricePopup.open) pricePopup.close();
 });
 document.querySelectorAll(".tab").forEach((button) => button.addEventListener("click", () => {
   document.querySelector(".tab.active").classList.remove("active");

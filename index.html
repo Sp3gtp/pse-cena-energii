@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0b1324" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://api.raporty.pse.pl; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; form-action 'self'" />
     <title>Cena energii PSE</title>
-    <link rel="stylesheet" href="./styles.css?v=zero-line" />
+    <link rel="stylesheet" href="./styles.css?v=price-popup" />
   </head>
   <body>
     <main class="shell">
@@ -29,6 +29,11 @@
           <p id="updated-at" class="muted">Oczekiwanie na dane…</p>
         </div>
         <div class="price-wrap">
+          <button type="button" id="price-popup-button" class="price-popup-button" aria-label="Otwórz okno z aktualną ceną" title="Pokaż samą cenę">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M5 9V5h4M15 5h4v4M19 15v4h-4M9 19H5v-4M8 12h8" />
+            </svg>
+          </button>
           <span id="current-price" class="price">—</span>
           <span class="unit">PLN/MWh</span>
         </div>
@@ -91,6 +96,10 @@
         <div class="author-signature">Aplikacja Stworzona Przez Eryka SP3GTP</div>
       </footer>
     </main>
-    <script src="./app.js?v=zero-line" defer></script>
+    <dialog id="price-popup" class="price-popup" aria-label="Aktualna cena energii">
+      <p id="popup-price" class="popup-price">—</p>
+      <p class="popup-unit">PLN/MWh</p>
+    </dialog>
+    <script src="./app.js?v=price-popup" defer></script>
   </body>
 </html>
