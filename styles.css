@@ -57,6 +57,8 @@ button { cursor: pointer; border: 0; }
 .axis-label { fill: #9caac2; font-size: 11px; }
 .axis-title { fill: #bbc7db; font-size: 12px; font-weight: 700; }
 .chart-axis { stroke: #7890b7; stroke-width: 1.5; }
+.zero-line { stroke: #ffb5a4; stroke-width: 1.5; stroke-dasharray: 6 6; opacity: .95; }
+.zero-label { fill: #ffb5a4; font-weight: 700; }
 .chart-point { fill: #66d9b4; stroke: #07131b; stroke-width: 2; cursor: crosshair; }
 .chart-point:hover { fill: #fff; r: 6; }
 .chart-tooltip { position: absolute; z-index: 2; padding: 7px 9px; color: #fff; background: #0b1324; border: 1px solid #66d9b4; border-radius: 7px; box-shadow: 0 5px 16px #0008; font-size: 12px; pointer-events: none; white-space: nowrap; }
