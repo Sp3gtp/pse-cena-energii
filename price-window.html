@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1324" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://api.raporty.pse.pl; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'" />
+    <title>Aktualna cena energii</title>
+    <link rel="stylesheet" href="./price-window.css?v=1" />
+  </head>
+  <body>
+    <main class="price-window-shell">
+      <section class="price-window-card">
+        <div id="connection-status" class="status status-loading">Ładowanie…</div>
+        <p class="label">Aktualny przedział</p>
+        <p id="current-period" class="period">—</p>
+        <p id="updated-at" class="muted">Oczekiwanie na dane…</p>
+        <p id="current-price" class="price">—</p>
+        <p class="unit">PLN/MWh</p>
+      </section>
+    </main>
+    <script src="./price-window.js?v=1" defer></script>
+  </body>
+</html>
