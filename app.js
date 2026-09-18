@@ -339,12 +339,12 @@ $("today-button").addEventListener("click", () => {
   $("date-input").value = currentDate;
   load();
 });
-$("price-popup-button").addEventListener("click", () => {
+$("price-popup-button").addEventListener("click", (event) => {
   const priceWindow = window.open("./price-window.html", "pse-current-price", "popup=yes,width=460,height=320,resizable=yes");
   if (!priceWindow) {
-    setStatus("Przeglądarka zablokowała nowe okno", "error");
     return;
   }
+  event.preventDefault();
   priceWindow.focus();
 });
 document.querySelectorAll(".tab").forEach((button) => button.addEventListener("click", () => {

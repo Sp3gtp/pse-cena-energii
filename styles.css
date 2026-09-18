@@ -24,7 +24,7 @@ h2 { margin-bottom: 0; font-size: 18px; }
 .price-low { color: #ff667d; }
 .price-high { color: #66d9b4; }
 .unit { display: block; color: #66d9b4; font-weight: 700; }
-.price-popup-button { position: absolute; top: 0; right: 0; display: grid; width: 28px; height: 28px; padding: 5px; color: #bbc7db; background: transparent; border: 1px solid #49628f; border-radius: 7px; }
+.price-popup-button { position: absolute; top: 0; right: 0; display: grid; width: 28px; height: 28px; padding: 5px; color: #bbc7db; background: transparent; border: 1px solid #49628f; border-radius: 7px; text-decoration: none; }
 .price-popup-button:hover { color: #07131b; background: #66d9b4; border-color: #66d9b4; }
 .price-popup-button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .price-popup-button svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; }
