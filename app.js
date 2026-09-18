@@ -26,6 +26,7 @@ let audioContext = null;
 let alertsEnabled = false;
 let priceAlarmTriggered = false;
 let lastSuccessfulSyncAt = null;
+let priceWindow = null;
 
 const $ = (id) => document.getElementById(id);
 function today() {
@@ -96,6 +97,14 @@ function groupRecords(records) {
   }));
 }
 function formatTime(date) { return date.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }); }
+function updatePriceWindow() {
+  if (!priceWindow || priceWindow.closed) return;
+  const currentPrice = $("current-price");
+  const price = priceWindow.document.getElementById("price-window-value");
+  if (!price) return;
+  price.textContent = currentPrice.textContent;
+  price.className = currentPrice.className;
+}
 function render() {
   const records = groupRecords(state.records);
   $("record-count").textContent = `${records.length} punktów`;
@@ -105,10 +114,7 @@ function render() {
   currentPrice.textContent = current ? current.price.toLocaleString("pl-PL", { maximumFractionDigits: 2 }) : "—";
   currentPrice.classList.toggle("price-low", Boolean(current && current.price < state.fallThreshold));
   currentPrice.classList.toggle("price-high", Boolean(current && current.price > state.riseThreshold));
-  const popupPrice = $("popup-price");
-  popupPrice.textContent = currentPrice.textContent;
-  popupPrice.classList.toggle("price-low", currentPrice.classList.contains("price-low"));
-  popupPrice.classList.toggle("price-high", currentPrice.classList.contains("price-high"));
+  updatePriceWindow();
   $("current-period").textContent = current ? (current.period || formatTime(current.time)) : "Brak odczytu";
   $("chart-title").textContent = "Ceny energii w dobie";
   const table = $("data-table");
@@ -343,19 +349,25 @@ $("today-button").addEventListener("click", () => {
   $("date-input").value = currentDate;
   load();
 });
-const pricePopup = $("price-popup");
 $("price-popup-button").addEventListener("click", () => {
-  if (!pricePopup.open) pricePopup.showModal();
-});
-pricePopup.addEventListener("click", (event) => {
-  if (event.target === pricePopup) pricePopup.close();
-});
-pricePopup.addEventListener("cancel", (event) => {
-  event.preventDefault();
-  pricePopup.close();
-});
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && pricePopup.open) pricePopup.close();
+  priceWindow = window.open("", "pse-current-price", "popup=yes,width=460,height=280,resizable=yes");
+  if (!priceWindow) {
+    setStatus("Przeglądarka zablokowała nowe okno", "error");
+    return;
+  }
+  priceWindow.document.title = "Aktualna cena energii";
+  priceWindow.document.body.replaceChildren();
+  const style = priceWindow.document.createElement("style");
+  style.textContent = "body{display:grid;place-items:center;min-height:100vh;margin:0;background:#080d18;color:#f5f7fb;font-family:system-ui,sans-serif;text-align:center}.price{margin:0;font-size:clamp(52px,18vw,100px);font-weight:800;letter-spacing:-.06em}.price-low{color:#ff667d}.price-high{color:#66d9b4}.unit{margin:12px 0 0;color:#66d9b4;font-size:18px;font-weight:700}";
+  const value = priceWindow.document.createElement("p");
+  value.id = "price-window-value";
+  const unit = priceWindow.document.createElement("p");
+  unit.className = "unit";
+  unit.textContent = "PLN/MWh";
+  priceWindow.document.head.appendChild(style);
+  priceWindow.document.body.append(value, unit);
+  updatePriceWindow();
+  priceWindow.focus();
 });
 document.querySelectorAll(".tab").forEach((button) => button.addEventListener("click", () => {
   document.querySelector(".tab.active").classList.remove("active");

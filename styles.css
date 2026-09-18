@@ -28,10 +28,6 @@ h2 { margin-bottom: 0; font-size: 18px; }
 .price-popup-button:hover { color: #07131b; background: #66d9b4; border-color: #66d9b4; }
 .price-popup-button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .price-popup-button svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; }
-.price-popup { width: min(90vw, 440px); padding: 38px 44px; color: #f5f7fb; background: #101c33; border: 1px solid #66d9b4; border-radius: 18px; box-shadow: 0 24px 80px #000b; text-align: center; }
-.price-popup::backdrop { background: rgba(2, 7, 17, .78); }
-.popup-price { margin: 0; font-size: clamp(52px, 12vw, 100px); font-weight: 800; letter-spacing: -.06em; line-height: 1; }
-.popup-unit { margin: 12px 0 0; color: #66d9b4; font-size: 18px; font-weight: 700; }
 .status { padding: 8px 12px; border-radius: 99px; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .status-loading { color: #f5c76b; background: #483b1f; }
 .status-ok { color: #66d9b4; background: #173c39; }
