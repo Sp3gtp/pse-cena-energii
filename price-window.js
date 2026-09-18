@@ -1,8 +1,11 @@
 const API_URL = "https://api.raporty.pse.pl/api/price-fcst";
 const REFRESH_MS = 60_000;
+const AUTO_RELOAD_DELAY_MS = 5_000;
+const AUTO_RELOAD_COOLDOWN_MS = 60_000;
 const DEFAULT_FALL_THRESHOLD = 550;
 const DEFAULT_RISE_THRESHOLD = 650;
 const $ = (id) => document.getElementById(id);
+let autoReloadTimer = null;
 
 function today() {
   const date = new Date();
@@ -22,6 +25,16 @@ function setStatus(text, kind) {
   const status = $("connection-status");
   status.textContent = text;
   status.className = `status status-${kind}`;
+}
+function scheduleAutoReload() {
+  if (autoReloadTimer !== null) return;
+  const lastAutoReloadAt = Number(sessionStorage.getItem("psePriceWindowAutoReloadAt"));
+  if (Number.isFinite(lastAutoReloadAt) && Date.now() - lastAutoReloadAt < AUTO_RELOAD_COOLDOWN_MS) return;
+  $("updated-at").textContent = `Brak połączenia. Odświeżanie strony za ${AUTO_RELOAD_DELAY_MS / 1000} s…`;
+  autoReloadTimer = setTimeout(() => {
+    sessionStorage.setItem("psePriceWindowAutoReloadAt", String(Date.now()));
+    window.location.reload();
+  }, AUTO_RELOAD_DELAY_MS);
 }
 
 function normalizeRecord(raw) {
@@ -53,10 +66,12 @@ async function load() {
     price.classList.toggle("price-high", current.price > storedThreshold("riseThreshold", DEFAULT_RISE_THRESHOLD));
     $("current-period").textContent = current.period || formatTime(current.time);
     $("updated-at").textContent = `Ostatnia synchronizacja: ${new Date().toLocaleTimeString("pl-PL")}`;
+    sessionStorage.removeItem("psePriceWindowAutoReloadAt");
     setStatus("Połączono z PSE", "ok");
   } catch (error) {
     setStatus("Błąd połączenia", "error");
     $("updated-at").textContent = error.message;
+    scheduleAutoReload();
   } finally {
     clearTimeout(timeout);
   }

@@ -2,6 +2,8 @@ const API_URL = "https://api.raporty.pse.pl/api/price-fcst";
 const REFRESH_MS = 60_000;
 const WATCHDOG_MS = 10_000;
 const MAX_SYNC_AGE_MS = REFRESH_MS * 2 + WATCHDOG_MS;
+const AUTO_RELOAD_DELAY_MS = 5_000;
+const AUTO_RELOAD_COOLDOWN_MS = 60_000;
 const ALERT_THRESHOLD = 100;
 const DEFAULT_FALL_THRESHOLD = 550;
 const DEFAULT_RISE_THRESHOLD = 650;
@@ -26,6 +28,7 @@ let audioContext = null;
 let alertsEnabled = false;
 let priceAlarmTriggered = false;
 let lastSuccessfulSyncAt = null;
+let autoReloadTimer = null;
 
 const $ = (id) => document.getElementById(id);
 function today() {
@@ -47,6 +50,16 @@ function setWatchdogWarning(isStale) {
 function checkSyncWatchdog() {
   const isStale = lastSuccessfulSyncAt === null || Date.now() - lastSuccessfulSyncAt > MAX_SYNC_AGE_MS;
   setWatchdogWarning(isStale);
+}
+function scheduleAutoReload() {
+  if (autoReloadTimer !== null) return;
+  const lastAutoReloadAt = Number(sessionStorage.getItem("pseAutoReloadAt"));
+  if (Number.isFinite(lastAutoReloadAt) && Date.now() - lastAutoReloadAt < AUTO_RELOAD_COOLDOWN_MS) return;
+  $("updated-at").textContent = `Brak połączenia. Odświeżanie strony za ${AUTO_RELOAD_DELAY_MS / 1000} s…`;
+  autoReloadTimer = setTimeout(() => {
+    sessionStorage.setItem("pseAutoReloadAt", String(Date.now()));
+    window.location.reload();
+  }, AUTO_RELOAD_DELAY_MS);
 }
 function number(value) {
   const result = Number(String(value ?? "").replace(",", "."));
@@ -315,12 +328,14 @@ async function load() {
     $("updated-at").textContent = `Ostatnia synchronizacja: ${now}`;
     $("footer-time").textContent = now;
     lastSuccessfulSyncAt = Date.now();
+    sessionStorage.removeItem("pseAutoReloadAt");
     setWatchdogWarning(false);
     setStatus("Połączono z PSE", "ok");
   } catch (error) {
     setStatus("Błąd połączenia", "error");
     $("updated-at").textContent = error.message;
     checkSyncWatchdog();
+    scheduleAutoReload();
   }
 }
 $("date-input").value = state.date;
