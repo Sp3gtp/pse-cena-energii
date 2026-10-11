@@ -1,4 +1,11 @@
 # Cena energii PSE
 
-Aplkacja pokazująca aktualną cenę energii elektrycznej na rynku bilansującym. Umożliwia ustawienie własnych progów alarmowych dla spadku ceny oraz dla wzrostu. Pobiera aktualną cenę CEN  z endpointu  publicznego API PSE (`api.raporty.pse.pl`), odświeża ją co 60 sekund i pokazuje wykres całej doby w surowych interwałach 15-minutowych. Ikona w prawym górnym rogu pola ceny otwiera osobne okno przeglądarki z tym samym panelem ceny co ekran główny. Okno samodzielnie pobiera dane PSE co minutę. Przy wykryciu błędu połączenia aplikacja automatycznie odświeża stronę po 5 sekundach; ograniczenie jednego odświeżenia na minutę zapobiega pętli przy awarii źródła danych.
-Link do Strony : https://sp3gtp.github.io/pse-cena-energii/
+Aplikacja pokazująca ceny energii elektrycznej na rynku bilansującym z publicznego API PSE (`api.raporty.pse.pl`). Główna strona oferuje wykres, progi i alerty w przeglądarce.
+
+## Wersja bez JavaScriptu: cenypsev2
+
+GitHub Actions generuje statyczną stronę w `cenypsev2/index.html` i publikuje ją razem z resztą GitHub Pages. Workflow pobiera dane z API PSE przy wdrożeniu oraz w harmonogramie co 5 minut. Harmonogram GitHub Actions może się opóźniać, więc częstotliwość aktualizacji nie jest gwarantowana.
+
+Adres wersji to `https://sp3gtp.github.io/pse-cena-energii/cenypsev2/`, jeśli repozytorium publikuje stronę pod obecnym adresem projektu. Do działania wymaga włączonego GitHub Pages korzystającego z workflow GitHub Actions. Wersja statyczna pokazuje bieżącą cenę, wykres i ostatnie odczyty, ale nie obsługuje alertów dźwiękowych ani interakcji wymagających JavaScriptu.
+
+Link do istniejącej strony: https://sp3gtp.github.io/pse-cena-energii/
