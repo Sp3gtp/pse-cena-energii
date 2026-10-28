@@ -13,9 +13,10 @@ body { margin: 0; min-width: 320px; background: radial-gradient(circle at 80% 0%
 .weather { text-align: right; font-size: 13px; }
 .weather-now { display: flex; gap: 8px; justify-content: flex-end; align-items: baseline; }
 #weather-temp { font-size: 22px; font-weight: 700; }
-.weather-forecast { display: flex; gap: 10px; margin-top: 6px; color: #9caac2; font-size: 12px; }
-.weather-forecast div { display: flex; flex-direction: column; align-items: center; min-width: 34px; }
-.weather-forecast b { color: #f5f7fb; font-weight: 600; }
+.weather-forecast { display: flex; gap: 6px; margin-top: 8px; color: #9caac2; font-size: 11px; }
+.weather-tile { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 44px; padding: 6px 4px; background: rgba(19, 30, 53, .82); border: 1px solid #293b61; border-radius: 10px; }
+.weather-icon { font-size: 18px; line-height: 1.2; }
+.weather-tile b { color: #f5f7fb; font-size: 13px; font-weight: 600; }
 @media (max-width: 720px) { .header-right, .weather, .weather-now { align-items: flex-start; text-align: left; justify-content: flex-start; } .weather-forecast { flex-wrap: wrap; } }
 .eyebrow { color: #66d9b4; font-size: 12px; letter-spacing: .16em; font-weight: 800; margin: 0 0 10px; }
 h1, h2, p { margin-top: 0; }
