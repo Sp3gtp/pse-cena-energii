@@ -334,7 +334,7 @@ async function load() {
       }
     }
     if (current) previousCurrentPrice = current.price;
-    const now = new Date().toLocaleTimeString("pl-PL");
+    const now = new Date().toLocaleTimeString("pl-PL", { timeZone: "Europe/Warsaw" });
     $("updated-at").textContent = `Ostatnia synchronizacja: ${now}`;
     $("footer-time").textContent = now;
     lastSuccessfulSyncAt = Date.now();

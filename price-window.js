@@ -66,7 +66,7 @@ async function load() {
     price.classList.toggle("price-low", current.price < storedThreshold("fallThreshold", DEFAULT_FALL_THRESHOLD));
     price.classList.toggle("price-high", current.price > storedThreshold("riseThreshold", DEFAULT_RISE_THRESHOLD));
     $("current-period").textContent = current.period || formatTime(current.time);
-    $("updated-at").textContent = `Ostatnia synchronizacja: ${new Date().toLocaleTimeString("pl-PL")}`;
+    $("updated-at").textContent = `Ostatnia synchronizacja: ${new Date().toLocaleTimeString("pl-PL", { timeZone: "Europe/Warsaw" })}`;
     sessionStorage.removeItem("psePriceWindowAutoReloadAt");
     setStatus("Połączono z PSE", "ok");
   } catch (error) {
