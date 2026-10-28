@@ -8,8 +8,7 @@ const $ = (id) => document.getElementById(id);
 let autoReloadTimer = null;
 
 function today() {
-  const date = new Date();
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Warsaw", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
 }
 
 function storedThreshold(key, fallback) {
@@ -18,7 +17,7 @@ function storedThreshold(key, fallback) {
 }
 
 function formatTime(date) {
-  return date.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" });
+  return date.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Warsaw" });
 }
 
 function setStatus(text, kind) {
@@ -39,7 +38,8 @@ function scheduleAutoReload() {
 
 function normalizeRecord(raw) {
   const price = Number(String(raw.cen_fcst ?? raw.cen_cost ?? raw.price ?? raw.value ?? "").replace(",", "."));
-  const time = new Date(raw.dtime ?? raw.date ?? raw.timestamp ?? raw.periodStart);
+  const utc = typeof raw.dtime_utc === "string" ? `${raw.dtime_utc.trim().replace(" ", "T")}Z` : null;
+  const time = new Date(utc ?? raw.dtime ?? raw.date ?? raw.timestamp ?? raw.periodStart);
   if (!Number.isFinite(price) || Number.isNaN(time.getTime())) return null;
   return { price, time, period: typeof raw.period === "string" ? raw.period : "" };
 }

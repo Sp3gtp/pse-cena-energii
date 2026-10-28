@@ -32,10 +32,7 @@ let autoReloadTimer = null;
 
 const $ = (id) => document.getElementById(id);
 function today() {
-  const date = new Date();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${date.getFullYear()}-${month}-${day}`;
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Warsaw", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
 }
 function setStatus(text, kind) {
   const el = $("connection-status");
@@ -67,8 +64,8 @@ function number(value) {
 }
 function normalizeRecord(raw) {
   const price = number(raw.cen_fcst ?? raw.cen_cost ?? raw.price ?? raw.value);
-  const time = raw.dtime ?? raw.date ?? raw.timestamp ?? raw.periodStart;
-  const parsedTime = new Date(time);
+  const utc = typeof raw.dtime_utc === "string" ? `${raw.dtime_utc.trim().replace(" ", "T")}Z` : null;
+  const parsedTime = new Date(utc ?? raw.dtime ?? raw.date ?? raw.timestamp ?? raw.periodStart);
   if (price === null || !Number.isFinite(parsedTime.getTime())) return null;
   return { time: parsedTime, price, period: typeof raw.period === "string" ? raw.period : "" };
 }
@@ -109,7 +106,7 @@ function groupRecords(records) {
     period: `${group.length} odczytów`
   }));
 }
-function formatTime(date) { return date.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }); }
+function formatTime(date) { return date.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Warsaw" }); }
 function render() {
   const records = groupRecords(state.records);
   $("record-count").textContent = `${records.length} punktów`;
