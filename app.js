@@ -80,6 +80,7 @@ async function fetchRecords() {
   try {
     response = await fetch(`${API_URL}?%24filter=${filter}`, {
       headers: { Accept: "application/json" },
+      cache: "no-store",
       signal: controller.signal
     });
   } finally {
@@ -298,7 +299,11 @@ function drawChart(records) {
     pointElement.addEventListener("blur", () => { tooltip.hidden = true; });
   });
 }
+let loadSeq = 0;
+let loadStartedAt = 0;
 async function load() {
+  const seq = ++loadSeq;
+  loadStartedAt = Date.now();
   const currentDate = today();
   if (state.followToday && state.date !== currentDate) {
     state.date = currentDate;
@@ -308,10 +313,14 @@ async function load() {
   }
   setStatus("Pobieranie…", "loading");
   try {
-    state.records = await fetchRecords();
+    const records = await fetchRecords();
+    if (seq !== loadSeq) return;
+    state.records = records;
     render();
-    if (!state.records.length || state.records.some((record) => !Number.isFinite(record.price) || Number.isNaN(record.time.getTime()))) {
-      throw new Error("PSE nie zwróciło prawidłowych danych");
+    if (!records.length) {
+      const empty = new Error("PSE nie zwróciło prawidłowych danych");
+      empty.noReload = true;
+      throw empty;
     }
     const current = state.records.find((item) => item.time > new Date()) ?? state.records.at(-1);
     if (current && previousCurrentPrice !== null) {
@@ -336,11 +345,17 @@ async function load() {
     setWatchdogWarning(false);
     setStatus("Połączono z PSE", "ok");
   } catch (error) {
+    if (seq !== loadSeq) return;
     setStatus("Błąd połączenia", "error");
-    $("updated-at").textContent = error.message;
+    $("updated-at").textContent = error.name === "AbortError" ? "Przekroczono czas oczekiwania na PSE" : error.message;
     checkSyncWatchdog();
-    scheduleAutoReload();
+    if (!error.noReload) scheduleAutoReload();
   }
+}
+function refreshIfNeeded() {
+  if (document.visibilityState !== "visible") return;
+  const age = lastSuccessfulSyncAt === null ? Infinity : Date.now() - lastSuccessfulSyncAt;
+  if (age >= REFRESH_MS / 2 && Date.now() - loadStartedAt > 5_000) load();
 }
 $("date-input").value = state.date;
 $("fall-threshold").value = state.fallThreshold;
@@ -387,8 +402,13 @@ async function requestWakeLock() {
   }
 }
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") requestWakeLock();
+  if (document.visibilityState === "visible") {
+    requestWakeLock();
+    refreshIfNeeded();
+  }
 });
+window.addEventListener("online", () => load());
+window.addEventListener("focus", refreshIfNeeded);
 function markButton(button, text) {
   button.classList.add("is-active");
   button.textContent = text;
@@ -457,5 +477,7 @@ $("save-thresholds").addEventListener("click", () => {
 requestWakeLock();
 armAlertsAutomatically();
 load();
-state.timer = setInterval(load, REFRESH_MS);
+state.timer = setInterval(() => {
+  if (Date.now() - loadStartedAt > 5_000) load();
+}, REFRESH_MS);
 setInterval(checkSyncWatchdog, WATCHDOG_MS);

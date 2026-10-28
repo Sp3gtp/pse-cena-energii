@@ -52,6 +52,7 @@ async function load() {
     const filter = encodeURIComponent(`business_date eq '${today()}'`);
     const response = await fetch(`${API_URL}?%24filter=${filter}`, {
       headers: { Accept: "application/json" },
+      cache: "no-store",
       signal: controller.signal
     });
     if (!response.ok) throw new Error(`API PSE zwróciło HTTP ${response.status}`);
@@ -79,3 +80,7 @@ async function load() {
 
 load();
 setInterval(load, REFRESH_MS);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") load();
+});
+window.addEventListener("online", load);

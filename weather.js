@@ -31,7 +31,7 @@
 
   async function loadWeather() {
     try {
-      const response = await fetch(URL, { cache: 'no-store' });
+      const response = await fetch(URL, { cache: 'no-store', signal: AbortSignal.timeout(10000) });
       if (!response.ok) throw new Error(response.status);
       const data = await response.json();
 
@@ -63,4 +63,7 @@
 
   loadWeather();
   setInterval(loadWeather, 15 * 60 * 1000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') loadWeather();
+  });
 })();
