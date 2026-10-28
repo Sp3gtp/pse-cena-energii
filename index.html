@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0b1324" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://api.raporty.pse.pl; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; form-action 'self'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://api.raporty.pse.pl https://api.open-meteo.com; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; form-action 'self'" />
     <title>Cena energii PSE</title>
     <link rel="stylesheet" href="./styles.css?v=price-window-link" />
   </head>
@@ -16,7 +16,11 @@
           <h1>Cena energii elektrycznej</h1>
           <p class="subtitle">Cena energii na rynku bilansującym z publicznego API PSE</p>
         </div>
-        <div>
+        <div class="header-right">
+          <div id="weather" class="weather" aria-label="Pogoda w Zielonej Górze">
+            <div class="weather-now"><span id="weather-temp">—</span><span id="weather-desc" class="muted">Zielona Góra</span></div>
+            <div id="weather-forecast" class="weather-forecast"></div>
+          </div>
           <div id="connection-status" class="status status-loading">Ładowanie…</div>
           <div id="sync-watchdog" class="sync-watchdog" role="status" hidden>uwaga nieaktualne dane</div>
         </div>
@@ -54,7 +58,6 @@
           <button type="button" id="refresh-button" class="refresh">Pobierz dane</button>
           <button type="button" id="reload-page-button" class="secondary">Odśwież stronę</button>
           <button type="button" id="alert-button" class="secondary" aria-pressed="false">Włącz alerty</button>
-          <a class="secondary" href="./cenypsev2/" aria-label="Otwórz statyczną wersję strony bez JavaScriptu">Wersja bez JavaScriptu</a>
         </div>
         <div class="thresholds" aria-label="Progi alarmów">
           <label>Alarm spadku <input id="fall-threshold" type="number" min="0" step="1" value="550" /> PLN/MWh</label>
@@ -98,5 +101,6 @@
       </footer>
     </main>
     <script src="./app.js?v=connection-auto-reload" defer></script>
+    <script src="./weather.js" defer></script>
   </body>
 </html>

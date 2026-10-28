@@ -267,13 +267,17 @@ function drawChart(records) {
     const [x] = points[index];
     return `<text class="axis-label" text-anchor="middle" x="${x}" y="${height - 12}">${formatTime(records[index].time)}</text>`;
   }).join("");
-  const pointMarks = points.map(([x, y], index) => `<circle class="chart-point" cx="${x}" cy="${y}" r="4" tabindex="0" data-index="${index}"></circle>`).join("");
+  const pointMarks = points.map(([x, y], index) => `<circle class="chart-point${records[index].price < 0 ? " negative" : ""}" cx="${x}" cy="${y}" r="4" tabindex="0" data-index="${index}"></circle>`).join("");
   const zeroY = yForValue(0);
+  const zeroOffset = Math.min(1, Math.max(0, zeroY / height));
   const zeroLine = `<line class="zero-line" x1="${padLeft}" y1="${zeroY}" x2="${width - padRight}" y2="${zeroY}"/>
     <text class="axis-label zero-label" text-anchor="end" x="${width - padRight - 4}" y="${zeroY - 6}">0 zł</text>`;
-  svg.innerHTML = `<defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#66d9b4" stop-opacity=".28"/><stop offset="1" stop-color="#66d9b4" stop-opacity="0"/></linearGradient></defs>
+  svg.innerHTML = `<defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#66d9b4" stop-opacity=".28"/><stop offset="1" stop-color="#66d9b4" stop-opacity="0"/></linearGradient>
+    <linearGradient id="line-split" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${height}"><stop offset="${zeroOffset}" stop-color="#66d9b4"/><stop offset="${zeroOffset}" stop-color="#ff4d4f"/></linearGradient>
+    <clipPath id="clip-pos"><rect x="0" y="0" width="${width}" height="${zeroY}"/></clipPath>
+    <clipPath id="clip-neg"><rect x="0" y="${zeroY}" width="${width}" height="${height}"/></clipPath></defs>
     ${yTicks}<line class="chart-axis" x1="${padLeft}" y1="${padTopBottom}" x2="${padLeft}" y2="${height - padTopBottom}"/><line class="chart-axis" x1="${padLeft}" y1="${height - padTopBottom}" x2="${width - padRight}" y2="${height - padTopBottom}"/>
-    ${zeroLine}<polygon class="chart-area" points="${area}"/><polyline class="chart-line" points="${line}"/>
+    ${zeroLine}<polygon class="chart-area" clip-path="url(#clip-pos)" points="${area}"/><polygon class="chart-area-negative" clip-path="url(#clip-neg)" points="${area}"/><polyline class="chart-line" points="${line}"/>
     ${pointMarks}${xTicks}<text class="axis-title" text-anchor="middle" x="${width / 2}" y="${height - 1}">Czas</text><text class="axis-title" text-anchor="middle" transform="translate(16 ${height / 2}) rotate(-90)">Cena [PLN/MWh]</text>
     <text class="axis-label" x="${padLeft + 4}" y="${padTopBottom - 10}">maks. ${max.toLocaleString("pl-PL", { maximumFractionDigits: 2 })}</text>
     <text class="axis-label" x="${padLeft + 4}" y="${height - padTopBottom - 8}">min. ${rangeMin.toLocaleString("pl-PL", { maximumFractionDigits: 2 })}</text>`;

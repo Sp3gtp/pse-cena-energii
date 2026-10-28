@@ -9,6 +9,14 @@ body { margin: 0; min-width: 320px; background: radial-gradient(circle at 80% 0%
 .shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 42px 0 28px; }
 .header, .section-heading, .toolbar, .hero { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .header { align-items: flex-start; margin-bottom: 28px; }
+.header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.weather { text-align: right; font-size: 13px; }
+.weather-now { display: flex; gap: 8px; justify-content: flex-end; align-items: baseline; }
+#weather-temp { font-size: 22px; font-weight: 700; }
+.weather-forecast { display: flex; gap: 10px; margin-top: 6px; color: #9caac2; font-size: 12px; }
+.weather-forecast div { display: flex; flex-direction: column; align-items: center; min-width: 34px; }
+.weather-forecast b { color: #f5f7fb; font-weight: 600; }
+@media (max-width: 720px) { .header-right, .weather, .weather-now { align-items: flex-start; text-align: left; justify-content: flex-start; } .weather-forecast { flex-wrap: wrap; } }
 .eyebrow { color: #66d9b4; font-size: 12px; letter-spacing: .16em; font-weight: 800; margin: 0 0 10px; }
 h1, h2, p { margin-top: 0; }
 h1 { margin-bottom: 8px; font-size: clamp(28px, 5vw, 48px); line-height: 1.05; }
@@ -56,8 +64,11 @@ button { cursor: pointer; border: 0; }
 .chart-scroll { position: relative; overflow-x: auto; margin-top: 20px; }
 #chart { display: block; width: 100%; min-width: 680px; height: 300px; }
 .grid-line { stroke: #2b3d62; stroke-width: 1; }
-.chart-line { fill: none; stroke: #66d9b4; stroke-width: 3; }
+.chart-line { fill: none; stroke: url(#line-split); stroke-width: 3; }
 .chart-area { fill: url(#area); }
+.chart-area-negative { fill: #ff4d4f; fill-opacity: .2; }
+.chart-point.negative { fill: #ff4d4f; }
+.chart-point.negative:hover { fill: #fff; }
 .chart-dot { fill: #66d9b4; }
 .axis-label { fill: #9caac2; font-size: 11px; }
 .axis-title { fill: #bbc7db; font-size: 12px; font-weight: 700; }
