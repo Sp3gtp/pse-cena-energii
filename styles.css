@@ -18,6 +18,9 @@ body { margin: 0; min-width: 320px; background: radial-gradient(circle at 80% 0%
 .weather-icon { font-size: 18px; line-height: 1.2; }
 .weather-tile b { color: #f5f7fb; font-size: 13px; font-weight: 600; }
 @media (max-width: 720px) { .header-right, .weather, .weather-now { align-items: flex-start; text-align: left; justify-content: flex-start; } .weather-forecast { flex-wrap: wrap; } }
+.clock { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; font-variant-numeric: tabular-nums; }
+#clock-time { font-size: 20px; font-weight: 700; letter-spacing: .04em; }
+#clock-date { font-size: 13px; }
 .eyebrow { color: #66d9b4; font-size: 12px; letter-spacing: .16em; font-weight: 800; margin: 0 0 10px; }
 h1, h2, p { margin-top: 0; }
 h1 { margin-bottom: 8px; font-size: clamp(28px, 5vw, 48px); line-height: 1.05; }

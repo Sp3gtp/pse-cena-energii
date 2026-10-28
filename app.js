@@ -474,6 +474,15 @@ $("save-thresholds").addEventListener("click", () => {
 requestWakeLock();
 armAlertsAutomatically();
 load();
+const clockTimeFormat = new Intl.DateTimeFormat("pl-PL", { timeZone: "Europe/Warsaw", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+const clockDateFormat = new Intl.DateTimeFormat("pl-PL", { timeZone: "Europe/Warsaw", weekday: "long", day: "numeric", month: "long", year: "numeric" });
+function updateClock() {
+  const now = new Date();
+  $("clock-time").textContent = clockTimeFormat.format(now);
+  $("clock-date").textContent = clockDateFormat.format(now);
+}
+updateClock();
+setInterval(updateClock, 1000);
 state.timer = setInterval(() => {
   if (Date.now() - loadStartedAt > 5_000) load();
 }, REFRESH_MS);

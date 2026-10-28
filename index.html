@@ -6,10 +6,14 @@
     <meta name="theme-color" content="#0b1324" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://api.raporty.pse.pl https://api.open-meteo.com; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; form-action 'self'" />
     <title>Cena energii PSE</title>
-    <link rel="stylesheet" href="./styles.css?v=weather-tiles" />
+    <link rel="stylesheet" href="./styles.css?v=clock" />
   </head>
   <body>
     <main class="shell">
+      <div class="clock" role="timer" aria-label="Aktualny czas w Polsce">
+        <span id="clock-time">--:--:--</span>
+        <span id="clock-date" class="muted"></span>
+      </div>
       <header class="header">
         <div>
           <p class="eyebrow">PSE • CEN</p>
@@ -100,7 +104,7 @@
         <div class="author-signature">Aplikacja Stworzona Przez Eryka SP3GTP</div>
       </footer>
     </main>
-    <script src="./app.js?v=tz-fix" defer></script>
+    <script src="./app.js?v=clock" defer></script>
     <script src="./weather.js?v=refresh-fix" defer></script>
   </body>
 </html>
